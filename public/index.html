@@ -7,102 +7,116 @@
 <meta name="description" content="Paste a suspicious message and find out in a second if it is a scam.">
 <meta name="theme-color" content="#f6f4ef">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23171717'/%3E%3Ctext x='32' y='47' font-family='Georgia,serif' font-size='44' font-weight='700' text-anchor='middle' fill='%23fff'%3E?%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400&family=Inter+Tight:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+  /* Type is the interface: a huge light serif for the verdict, a tight grotesk for everything else.
+     No cards, no rounded boxes. Colour is spent only on the verdict. */
   :root {
-    --bg: #f6f4ef; --card: #ffffff; --ink: #171717; --muted: #5f5f5a; --line: #dedbd2;
-    --red: #b3261e; --red-bg: #fdecea; --yellow: #8a5a00; --yellow-bg: #fff4d6;
-    --green: #1b6e3c; --green-bg: #e6f4ea; --focus: #1a56db;
+    --bg: #f2eee4; --ink: #111110; --muted: #5d5b53; --line: #111110;
+    --serif: "Fraunces", "Iowan Old Style", Georgia, serif;
+    --sans: "Inter Tight", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --red: #d62718; --on-red: #fff; --yellow: #ffcf33; --on-yellow: #111110; --green: #0f6b3a; --on-green: #fff;
+    --focus: #1a56db;
   }
   @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #141413; --card: #1f1f1d; --ink: #f2f0ea; --muted: #a8a69e; --line: #3a3a36;
-      --red: #ffb4ab; --red-bg: #4a1512; --yellow: #ffd479; --yellow-bg: #453300;
-      --green: #8fd9a8; --green-bg: #12381f; --focus: #8ab4ff;
-    }
+    :root { --bg: #121211; --ink: #f2eee4; --muted: #a8a69e; --line: #f2eee4; --focus: #8ab4ff; }
   }
   * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
-  body {
-    margin: 0; background: var(--bg); color: var(--ink);
-    font: 19px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  }
-  main { max-width: 640px; margin: 0 auto; padding: 20px 16px 48px; }
-  header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-  h1 { font: 700 44px/1 Georgia, "Times New Roman", serif; margin: 8px 0 0; letter-spacing: -1px; }
-  .lang { display: flex; gap: 4px; }
-  .lang button {
-    font: inherit; font-size: 15px; padding: 6px 10px; border-radius: 8px; cursor: pointer;
-    background: none; color: var(--muted); border: 1px solid transparent;
-  }
-  .lang button[aria-pressed="true"] { color: var(--ink); border-color: var(--line); background: var(--card); }
-  .tagline { color: var(--muted); margin: 6px 0 20px; }
-  label { display: block; font-weight: 600; margin-bottom: 8px; }
+  html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
+  body { margin: 0; overflow-x: clip; background: var(--bg); color: var(--ink); font: 400 20px/1.45 var(--sans); }
+  main { max-width: 1100px; margin: 0 auto; padding: 18px clamp(16px, 4vw, 40px) 56px; }
+  header { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 16px; }
+  .brand { font: 500 18px/1 var(--sans); letter-spacing: .02em; }
+  .lang { display: flex; gap: 14px; }
+  .lang button { font: inherit; font-size: 16px; padding: 6px 0; cursor: pointer; background: none; border: 0; border-bottom: 2px solid transparent; color: var(--muted); }
+  .lang button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+
+  h1 { font: 300 clamp(54px, 15.5vw, 190px)/.92 var(--serif); letter-spacing: -.035em; margin: clamp(28px, 7vw, 80px) 0 18px; font-variation-settings: "opsz" 144; }
+  .tagline { font-size: clamp(20px, 3vw, 28px); line-height: 1.25; color: var(--muted); max-width: 22em; margin: 0 0 clamp(24px, 5vw, 48px); }
+
+  label { display: block; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
   textarea {
-    width: 100%; min-height: 150px; padding: 14px; resize: vertical;
-    font: inherit; color: var(--ink); background: var(--card);
-    border: 2px solid var(--line); border-radius: 14px;
+    width: 100%; min-height: 170px; padding: 8px 0 14px; resize: vertical; display: block;
+    font: 300 clamp(26px, 4.4vw, 44px)/1.15 var(--serif); letter-spacing: -.01em; color: var(--ink);
+    background: none; border: 0; border-bottom: 3px solid var(--line); border-radius: 0;
   }
-  textarea:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
-  .row { display: flex; gap: 10px; margin-top: 12px; }
+  textarea::placeholder { color: color-mix(in srgb, var(--ink) 30%, transparent); }
+  textarea:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+  .row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
   button.big {
-    flex: 1; min-height: 58px; font: inherit; font-weight: 700; font-size: 21px;
-    border-radius: 14px; cursor: pointer; border: 2px solid var(--ink);
-    background: var(--ink); color: var(--bg);
+    flex: 1 1 220px; min-height: 64px; font: 700 22px/1 var(--sans); letter-spacing: .01em;
+    cursor: pointer; border: 3px solid var(--ink); border-radius: 0; background: var(--ink); color: var(--bg);
   }
-  button.big.ghost { flex: 0 0 auto; padding: 0 18px; background: none; color: var(--ink); border-color: var(--line); font-weight: 600; font-size: 18px; }
+  button.big.ghost { flex: 0 0 auto; background: none; color: var(--ink); padding: 0 24px; font-weight: 500; }
+  button.big:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
   button:disabled { opacity: .55; cursor: wait; }
-  .examples { margin-top: 14px; font-size: 16px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-  .examples button {
-    font: inherit; font-size: 15px; padding: 6px 12px; border-radius: 999px; cursor: pointer;
-    background: none; color: var(--ink); border: 1px solid var(--line);
-  }
-  #result { margin-top: 24px; border-radius: 18px; padding: 22px 20px; border: 2px solid; }
+  .examples { margin-top: 20px; font-size: 17px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: baseline; }
+  .examples button { font: inherit; font-size: 17px; padding: 2px 0; cursor: pointer; background: none; color: var(--ink); border: 0; border-bottom: 2px solid var(--ink); }
+
+  /* The verdict takes the whole width of the screen. */
+  #result { margin-top: clamp(36px, 7vw, 80px); width: 100vw; margin-left: calc(50% - 50vw); padding: clamp(28px, 6vw, 72px) 0 clamp(36px, 6vw, 72px); }
   #result[hidden] { display: none; }
-  #result.red { background: var(--red-bg); border-color: var(--red); }
-  #result.yellow { background: var(--yellow-bg); border-color: var(--yellow); }
-  #result.green { background: var(--green-bg); border-color: var(--green); }
-  #result.error { background: var(--card); border-color: var(--line); }
-  .badge { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 26px; line-height: 1.15; }
-  .red .badge { color: var(--red); } .yellow .badge { color: var(--yellow); } .green .badge { color: var(--green); }
-  .dot { width: 30px; height: 30px; border-radius: 50%; background: currentColor; flex: none; }
-  .headline { font-size: 23px; font-weight: 600; line-height: 1.3; margin: 14px 0 6px; overflow-wrap: anywhere; }
-  .action { font-size: 21px; margin: 10px 0 0; }
-  .action strong { display: block; font-size: 15px; text-transform: uppercase; letter-spacing: .06em; opacity: .75; }
-  .checks { list-style: none; margin: 16px 0 4px; padding: 0; display: grid; gap: 8px; }
-  .checks li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 10px 14px; border-radius: 12px; background: color-mix(in srgb, var(--card) 70%, transparent); border: 1px solid var(--line); font-size: 18px; }
-  .checks b { font-weight: 800; text-align: right; overflow-wrap: anywhere; }
-  .checks .bad b { color: var(--red); } .checks .ok b { color: var(--green); }
-  #speak { margin-top: 18px; width: 100%; background: none; color: var(--ink); border-color: currentColor; }
-  #speak[hidden] { display: none; }
-  #share { margin-top: 12px; width: 100%; background: none; color: var(--ink); border-color: currentColor; }
-  details { margin-top: 18px; font-size: 16px; }
-  summary { cursor: pointer; font-weight: 600; padding: 6px 0; }
+  #result > .inner { max-width: 1100px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 40px); }
+  #result.red { background: var(--red); color: var(--on-red); --line: var(--on-red); --ink: var(--on-red); --bg: var(--red); --muted: color-mix(in srgb, var(--on-red) 80%, transparent); }
+  #result.yellow { background: var(--yellow); color: var(--on-yellow); --line: var(--on-yellow); --ink: var(--on-yellow); --bg: var(--yellow); --muted: color-mix(in srgb, var(--on-yellow) 75%, transparent); }
+  #result.green { background: var(--green); color: var(--on-green); --line: var(--on-green); --ink: var(--on-green); --bg: var(--green); --muted: color-mix(in srgb, var(--on-green) 80%, transparent); }
+  #result.error { color: var(--ink); border-top: 3px solid var(--ink); border-bottom: 3px solid var(--ink); }
+  .badge { font: 300 clamp(54px, 19vw, 250px)/.88 var(--serif); letter-spacing: -.04em; margin: 0; text-transform: uppercase; font-variation-settings: "opsz" 144; overflow-wrap: anywhere; }
+  .headline { font: 400 clamp(26px, 4.2vw, 46px)/1.12 var(--serif); letter-spacing: -.01em; margin: clamp(18px, 3vw, 32px) 0 0; max-width: 24em; overflow-wrap: anywhere; }
+  #result.error .headline { margin-top: 0; }
+
+  .checks { list-style: none; margin: clamp(22px, 4vw, 40px) 0 0; padding: 0; border-top: 2px solid var(--line); }
+  .checks li { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 14px 0; border-bottom: 2px solid var(--line); font-size: clamp(19px, 2.6vw, 26px); }
+  .checks b { font: 700 clamp(22px, 3vw, 30px)/1.1 var(--sans); text-align: right; overflow-wrap: anywhere; }
+  .checks .bad b { text-decoration: underline; text-decoration-thickness: 4px; text-underline-offset: 5px; }
+
+  .msglabel { margin: clamp(22px, 4vw, 40px) 0 6px; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  #marked { margin: 0; max-height: 11em; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font: 300 clamp(20px, 2.8vw, 28px)/1.3 var(--serif); }
+  #marked mark { color: inherit; padding: 0 2px; font-weight: 400; }
+  #marked mark.bad { background: none; text-decoration: line-through; text-decoration-thickness: 4px; text-decoration-skip-ink: none; }
+  #marked mark.ok { background: none; text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 4px; }
+  /* "Not sure": a wavy underline, so the link stays readable instead of being struck out. */
+  #result.yellow #marked mark.bad, #result.green #marked mark.bad { text-decoration-line: underline; text-decoration-style: wavy; text-underline-offset: 5px; }
+
+  .action { font: 400 clamp(24px, 3.4vw, 38px)/1.2 var(--serif); margin: clamp(24px, 4vw, 44px) 0 0; max-width: 26em; }
+  .action strong { display: block; font: 500 15px/1 var(--sans); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 10px; color: var(--muted); }
+  #result .row { margin-top: 28px; }
+  #result button.big { background: none; color: var(--ink); border-color: var(--ink); }
+  #result button.big:hover:not(:disabled) { box-shadow: 4px 4px 0 var(--ink); }
+  #speak[hidden], #share[hidden] { display: none; }
+  details { margin-top: 28px; font-size: 17px; }
+  summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
   details ul { margin: 8px 0; padding-left: 20px; }
   details li { margin: 4px 0; overflow-wrap: anywhere; }
   .meter { display: grid; grid-template-columns: minmax(0, 1fr) 90px 44px; gap: 8px; align-items: center; margin: 6px 0; }
-  .bar { height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--ink) 15%, transparent); overflow: hidden; }
+  .bar { height: 8px; background: color-mix(in srgb, var(--ink) 20%, transparent); overflow: hidden; }
   .bar i { display: block; height: 100%; background: var(--ink); }
   .num { text-align: right; font-variant-numeric: tabular-nums; }
   .small { font-size: 14px; color: var(--muted); }
-  footer { margin-top: 36px; font-size: 15px; color: var(--muted); }
+  footer { margin-top: 48px; font-size: 15px; color: var(--muted); max-width: 40em; }
   footer p { margin: 6px 0; }
-  .mock { background: var(--yellow-bg); color: var(--yellow); padding: 6px 10px; border-radius: 8px; font-size: 14px; margin-top: 12px; }
+  .mock { border: 2px dashed currentColor; padding: 6px 10px; font-size: 14px; margin-top: 16px; }
+  @media (max-width: 520px) { .checks li { flex-direction: column; gap: 2px; } .checks b { text-align: left; } }
+  @media (prefers-reduced-motion: reduce) { button.big:hover:not(:disabled) { transform: none; } }
 </style>
 </head>
 <body>
 <main>
   <header>
-    <h1>Legit?</h1>
+    <span class="brand">Legit?</span>
     <div class="lang" role="group" aria-label="Language">
       <button type="button" data-lang="es">Español</button>
       <button type="button" data-lang="en">English</button>
     </div>
   </header>
+  <h1 data-t="h1"></h1>
   <p class="tagline" data-t="tagline"></p>
 
   <form id="form">
     <label for="text" data-t="label"></label>
-    <textarea id="text" maxlength="4000" required autocomplete="off" spellcheck="false"></textarea>
+    <textarea id="text" maxlength="4000" required autocomplete="off" spellcheck="false" data-ph="placeholder"></textarea>
     <div class="row">
       <button class="big ghost" type="button" id="paste" data-t="paste"></button>
       <button class="big" type="submit" id="go" data-t="go"></button>
@@ -114,14 +128,20 @@
     <button type="button" data-ex="scam" data-t="exScam"></button>
     <button type="button" data-ex="legit" data-t="exLegit"></button>
   </div>
+</main>
 
-  <section id="result" hidden aria-live="polite">
-    <div class="badge"><span class="dot" aria-hidden="true"></span><span id="badge"></span></div>
+<section id="result" hidden aria-live="polite">
+  <div class="inner">
+    <h2 class="badge" id="badge"></h2>
     <p class="headline" id="headline"></p>
     <ul class="checks" id="checks"></ul>
+    <p class="msglabel" data-t="yourMessage"></p>
+    <p id="marked"></p>
     <p class="action"><strong data-t="whatToDo"></strong><span id="action"></span></p>
-    <button class="big" type="button" id="speak" data-t="speak"></button>
-    <button class="big" type="button" id="share" data-t="share"></button>
+    <div class="row">
+      <button class="big" type="button" id="speak" data-t="speak"></button>
+      <button class="big" type="button" id="share" data-t="share"></button>
+    </div>
     <details id="why">
       <summary data-t="why"></summary>
       <ul id="reasons"></ul>
@@ -129,8 +149,10 @@
       <p class="small" id="meta"></p>
     </details>
     <p class="mock" id="mock" hidden data-t="mock"></p>
-  </section>
+  </div>
+</section>
 
+<main>
   <footer>
     <p data-t="privacy"></p>
     <p data-t="limits"></p>
@@ -140,6 +162,8 @@
 <script>
 const I18N = {
   es: {
+    h1: "¿Es una estafa?", placeholder: "Pega aquí lo que te ha llegado…", yourMessage: "Tu mensaje",
+    word: { red: "Estafa.", yellow: "Cuidado.", green: "De fiar." },
     tagline: "Pega el mensaje que te ha llegado y te digo si es una estafa.",
     label: "El mensaje (SMS, WhatsApp o correo)",
     paste: "Pegar", go: "Comprobar", checking: "Analizando…",
@@ -207,6 +231,8 @@ const I18N = {
     },
   },
   en: {
+    h1: "Is it a scam?", placeholder: "Paste what you received here…", yourMessage: "Your message",
+    word: { red: "Scam.", yellow: "Careful.", green: "Legit." },
     tagline: "Paste the message you received and I'll tell you if it's a scam.",
     label: "The message (text, WhatsApp or e-mail)",
     paste: "Paste", go: "Check", checking: "Checking…",
@@ -291,6 +317,7 @@ function setLang(next) {
   try { localStorage.setItem("lang", lang); } catch {}
   const t = I18N[lang];
   document.querySelectorAll("[data-t]").forEach((el) => { el.textContent = t[el.dataset.t]; });
+  document.querySelectorAll("[data-ph]").forEach((el) => { el.placeholder = t[el.dataset.ph]; });
   document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
   if (last) render(last);
 }
@@ -300,6 +327,31 @@ function reasonText(r) {
   let code = r.code;
   if (code === "lookalike" && !r.brand) code = "lookalike_nobrand";
   return fill(t.reasons[code] ?? code, { ...r, type: t.types[r.type] ?? r.type });
+}
+
+// The user's own message, with every link marked: struck through when it is not the claimed
+// brand's, underlined when it is. Built with text nodes only (the message is untrusted).
+function renderMarked(data) {
+  const text = data.text ?? "";
+  const spots = [];
+  for (const l of data.links) {
+    const at = text.indexOf(l.raw);
+    if (at >= 0) spots.push({ at, end: at + l.raw.length, ok: Boolean(data.own && l.kind === "official") });
+  }
+  spots.sort((a, b) => a.at - b.at);
+  const nodes = [];
+  let pos = 0;
+  for (const sp of spots) {
+    if (sp.at < pos) continue;
+    nodes.push(document.createTextNode(text.slice(pos, sp.at)));
+    const m = document.createElement("mark");
+    m.className = sp.ok ? "ok" : "bad";
+    m.textContent = text.slice(sp.at, sp.end);
+    nodes.push(m);
+    pos = sp.end;
+  }
+  nodes.push(document.createTextNode(text.slice(pos)));
+  $("marked").replaceChildren(...nodes);
 }
 
 // Three plain questions: the whole verdict, readable without knowing anything about links.
@@ -352,7 +404,7 @@ function showError(code) {
   box.querySelector(".badge").hidden = true;
   $("headline").textContent = t.errors[code] ?? t.errors.unavailable;
   box.querySelector(".action").hidden = true;
-  $("share").hidden = true; $("speak").hidden = true; $("checks").replaceChildren(); $("why").hidden = true; $("mock").hidden = true;
+  $("share").hidden = true; $("speak").hidden = true; $("marked").replaceChildren(); document.querySelectorAll(".msglabel").forEach((e) => (e.hidden = true)); $("checks").replaceChildren(); $("why").hidden = true; $("mock").hidden = true;
 }
 
 function meter(label, value, max = 1) {
@@ -374,8 +426,9 @@ function render(data) {
   box.className = data.verdict;
   box.hidden = false;
   box.querySelector(".badge").hidden = false;
+  document.querySelectorAll(".msglabel").forEach((e) => (e.hidden = false));
   box.querySelector(".action").hidden = false;
-  $("badge").textContent = t.badge[data.verdict];
+  $("badge").textContent = t.word[data.verdict];
   $("headline").textContent = reasonText(data.headline);
   $("action").textContent = data.verdict === "red"
     ? (t.actions.red[data.type] ?? t.actions.red.default)
@@ -385,6 +438,7 @@ function render(data) {
   $("why").hidden = false;
   stopSpeaking();
   renderChecks(data);
+  renderMarked(data);
 
   const ul = $("reasons"); ul.replaceChildren();
   for (const r of data.reasons) { const li = document.createElement("li"); li.textContent = reasonText(r); ul.append(li); }
@@ -412,7 +466,7 @@ async function check() {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }),
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) { showError(data.error ?? "unavailable"); if (data.detail) console.warn("Legit?", data.detail, data.message ?? ""); } else render(data);
+    if (!res.ok) { showError(data.error ?? "unavailable"); if (data.detail) console.warn("Legit?", data.detail, data.message ?? ""); } else render({ ...data, text });
   } catch {
     showError("unavailable");
   } finally {
