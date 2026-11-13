@@ -19,7 +19,7 @@ Pensado para una persona mayor: un color (rojo, amarillo o verde), una frase y u
    | ¿Qué patrón de estafa sigue? | `choice` | banco, paquete, cuenta, premio, familiar en apuros, soporte técnico, inversión, ninguno |
    | ¿Cuánta presión mete? | `score` | de «ninguna» a «extrema» |
 
-2. **El código comprueba lo que Clef no puede saber** ([`lib/links.js`](lib/links.js)): saca los enlaces y mira el dominio real con [`tldts`](https://www.npmjs.com/package/tldts) (`amazon.com.seguridad.xyz` es de `seguridad.xyz`), si es de verdad de esa marca ([`lib/brands.js`](lib/brands.js)), si la imita (`paypa1.com`, `bbva-clientes.com`), si mezcla letras de otro alfabeto, si es un acortador o una IP.
+2. **El código comprueba lo que Clef no puede saber** ([`lib/links.js`](lib/links.js)): saca los enlaces y mira el dominio real con [`tldts`](https://www.npmjs.com/package/tldts) (`amazon.com.seguridad.xyz` es de `seguridad.xyz`), si es de verdad de esa marca ([`lib/brands.js`](lib/brands.js)), si la imita (`paypa1.com`, `bbva-clientes.com`, o mal escrita como `mcirosfot.com`), si mezcla letras de otro alfabeto, si es un acortador o una IP. Si el dominio es el nombre exacto de la marca con una terminación que no está en la lista (`netflix.co`), mira si su portada redirige al dominio oficial; si no, avisa en amarillo sin acusar.
 
 3. **El veredicto sale de reglas** sobre esas respuestas, no de texto generado ([`lib/verdict.js`](lib/verdict.js)). Ejemplo: dice ser una marca, el enlace no es de esa marca y pide datos → rojo. Cada motivo es un código que la web traduce, y la web enseña las probabilidades de Clef en «Por qué».
 

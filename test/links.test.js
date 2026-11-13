@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { extractLinks, refang } from "../lib/links.js";
+import { extractLinks, refang, verifyByRedirect } from "../lib/links.js";
 
 const one = (text) => {
   const links = extractLinks(text);
@@ -33,6 +33,30 @@ test("look-alikes: hyphens, digits for letters, squashed names", () => {
   assert.equal(one("https://paypa1.com/signin").kind, "lookalike");
   assert.equal(one("https://secure-amaz0n.co/a").brand, "amazon");
   assert.equal(one("https://wells-fargo-alerts.net").brand, "wellsfargo");
+});
+
+test("misspelt brand names are imitations", () => {
+  assert.equal(one("https://mcirosfot.com/login").brand, "microsoft");
+  assert.equal(one("https://micorsoft-support.net").brand, "microsoft");
+  assert.equal(one("https://netfilx.com").brand, "netflix");
+  assert.equal(one("https://secure.paypla.com/x").brand, "paypal");
+  assert.equal(one("https://amazing-deals.com").kind, "unknown");
+  assert.equal(one("https://googol.org").kind, "unknown");
+});
+
+test("an unlisted brand domain that redirects to the official site becomes official", async () => {
+  const reply = (status, location) => ({ status, headers: new Headers(location ? { location } : {}) });
+  const good = extractLinks("https://www.netflix.co/login");
+  await verifyByRedirect(good, async () => reply(301, "https://www.netflix.com/co/"));
+  assert.equal(good[0].kind, "official");
+
+  const parked = extractLinks("https://www.netflix.co/login");
+  await verifyByRedirect(parked, async () => reply(200));
+  assert.equal(parked[0].kind, "unverified");
+
+  const elsewhere = extractLinks("https://www.netflix.co/login");
+  await verifyByRedirect(elsewhere, async () => reply(302, "https://parking-ads.example.com/"));
+  assert.equal(elsewhere[0].kind, "unverified");
 });
 
 test("short keywords only match whole tokens", () => {
