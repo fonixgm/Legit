@@ -13,6 +13,14 @@ test("official domain, including subdomains and country sites", () => {
   assert.equal(one("login.microsoftonline.com/common").kind, "official");
 });
 
+test("brand name with an unlisted country ending is unverified, not an imitation", () => {
+  assert.equal(one("https://www.amazon.cl/ofertas").kind, "official");
+  const l = one("https://www.netflix.co/login");
+  assert.equal(l.kind, "unverified");
+  assert.equal(l.brand, "netflix");
+  assert.equal(one("https://amazon-cl.com").kind, "lookalike");
+});
+
 test("brand as a subdomain of someone else's domain is not official", () => {
   const l = one("https://amazon.com.account-check.xyz/login");
   assert.equal(l.domain, "account-check.xyz");

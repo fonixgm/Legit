@@ -43,6 +43,12 @@ test("brand message linking to another known brand (carrier) is not a mismatch",
   assert.notEqual(r.verdict, "red");
 });
 
+test("brand's name on an unlisted country domain = yellow, not red", () => {
+  const r = run(clef({ brand: { id: "netflix", p: 0.9 } }), "Netflix: nueva temporada https://www.netflix.co/title/1");
+  assert.equal(r.verdict, "yellow");
+  assert.equal(r.headline.code, "unverified_brand_domain");
+});
+
 test("relative in trouble asking for money, no link = red", () => {
   const r = run(clef({ asks: 0.85, type: { id: "family", p: 0.8 }, pressure: 1.8 }));
   assert.equal(r.verdict, "red");
