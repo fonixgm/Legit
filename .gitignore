@@ -4,3 +4,5 @@ node_modules/
 .vercel/
 eval/results.json
 eval/RESULTS.mock.md
+eval/RESULTS.baseline.md
+eval/RESULTS.mock.md
