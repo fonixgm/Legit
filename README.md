@@ -10,12 +10,12 @@ Pensado para una persona mayor: un color (rojo, amarillo o verde), una frase y u
 
 ## Cómo decide
 
-1. **Clef decide (vía NaN).** Una sola petición con cuatro preguntas tipadas sobre el mensaje ([`lib/clef.js`](lib/clef.js)):
+1. **Clef decide (vía NaN).** Una sola petición con preguntas tipadas sobre el mensaje ([`lib/clef.js`](lib/clef.js)):
 
    | Pregunta | Tipo | Respuestas |
    |---|---|---|
    | ¿Pide datos, códigos o dinero? | `noul` | probabilidad de «sí» |
-   | ¿De qué marca dice ser? | `choice` | 30 marcas globales, «otra» y «ninguna» |
+   | ¿De qué marca dice ser? | `choice` ×2 | 30 marcas globales, «otra» y «ninguna» (en dos preguntas: Clef admite 26 opciones por pregunta) |
    | ¿Qué patrón de estafa sigue? | `choice` | banco, paquete, cuenta, premio, familiar en apuros, soporte técnico, inversión, ninguno |
    | ¿Cuánta presión mete? | `score` | de «ninguna» a «extrema» |
 

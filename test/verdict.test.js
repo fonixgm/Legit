@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { decide } from "../lib/verdict.js";
 import { extractLinks } from "../lib/links.js";
-import { readAnswers } from "../lib/clef.js";
+import { buildQuestions, readAnswers } from "../lib/clef.js";
 
 // Clef answers are faked here on purpose: these tests pin the RULES, not the model.
 const clef = (o = {}) => ({
@@ -63,11 +63,14 @@ test("readAnswers parses the documented Clef response shape", () => {
   const a = readAnswers({
     answers: {
       asks: { type: "noul", noul: 0.94 },
-      brand: { type: "choice", choice: "amazon", probabilities: { amazon: 0.93, none: 0.07 }, confidence: 0.9 },
+      brand_online: { type: "choice", choice: "amazon", probabilities: { amazon: 0.93, none: 0.07 }, confidence: 0.9 },
+      brand_money: { type: "choice", choice: "other", probabilities: { other: 0.6, none: 0.4 }, confidence: 0.5 },
       scam_type: { type: "choice", choice: "account", probabilities: { account: 0.7 }, confidence: 0.6 },
       pressure: { type: "score", score: 2.6, confidence: 0.7 },
     },
   });
   assert.deepEqual(a, { asks: 0.94, brand: { id: "amazon", p: 0.93 }, type: { id: "account", p: 0.7 }, pressure: 2.6, pressureConfidence: 0.7 });
   assert.equal(readAnswers({}).brand.id, "none");
+  const q = buildQuestions();
+  for (const k of ["brand_online", "brand_money", "scam_type"]) assert.ok(Object.keys(q[k].criteria).length <= 26, k);
 });
