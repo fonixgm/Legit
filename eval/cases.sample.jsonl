@@ -1,0 +1,10 @@
+// SYNTHETIC examples written by hand to try the runner. They are NOT the measurement set.
+// The published figure must come from eval/cases.jsonl: 30 real scams + 30 real legitimate messages.
+{"id":"x-s1","label":"scam","text":"BBVA: Hemos detectado un acceso no autorizado. Su cuenta sera bloqueada en 24h. Verifique su identidad ahora: hxxps://bbva-seguridad-clientes[.]com/verificar","source":"synthetic"}
+{"id":"x-s2","label":"scam","text":"Amazon: your Prime membership could not be renewed. Update your payment details within 24 hours to avoid suspension: hxxps://amazon.com.billing-update[.]top/prime","source":"synthetic"}
+{"id":"x-s3","label":"scam","text":"Hola mamá, se me ha roto el móvil y este es mi número nuevo. Necesito que me hagas un Bizum de 480 euros hoy, luego te lo explico.","source":"synthetic"}
+{"id":"x-s4","label":"scam","text":"DHL: your parcel is on hold. Pay the 1.99 EUR customs fee to release it: bit[.]ly/3dhLpay","source":"synthetic"}
+{"id":"x-l1","label":"legit","text":"BBVA: compra de 23,90 EUR en MERCADONA con tu tarjeta *4821. Si no la reconoces, consulta tus movimientos en la app.","source":"synthetic"}
+{"id":"x-l2","label":"legit","text":"Amazon: your package with 2 items was delivered. Track or manage your order: https://www.amazon.com/your-orders","source":"synthetic"}
+{"id":"x-l3","label":"legit","text":"482913 is your Microsoft verification code. Don't share it with anyone.","source":"synthetic"}
+{"id":"x-l4","label":"legit","text":"Hola mamá, llego sobre las 5.30. ¿Compro pan?","source":"synthetic"}

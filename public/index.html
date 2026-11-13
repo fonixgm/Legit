@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Legit?</title>
+<meta name="description" content="Paste a suspicious message and find out in a second if it is a scam.">
+<meta name="theme-color" content="#f6f4ef">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23171717'/%3E%3Ctext x='32' y='47' font-family='Georgia,serif' font-size='44' font-weight='700' text-anchor='middle' fill='%23fff'%3E?%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #f6f4ef; --card: #ffffff; --ink: #171717; --muted: #5f5f5a; --line: #dedbd2;
+    --red: #b3261e; --red-bg: #fdecea; --yellow: #8a5a00; --yellow-bg: #fff4d6;
+    --green: #1b6e3c; --green-bg: #e6f4ea; --focus: #1a56db;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141413; --card: #1f1f1d; --ink: #f2f0ea; --muted: #a8a69e; --line: #3a3a36;
+      --red: #ffb4ab; --red-bg: #4a1512; --yellow: #ffd479; --yellow-bg: #453300;
+      --green: #8fd9a8; --green-bg: #12381f; --focus: #8ab4ff;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 19px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 640px; margin: 0 auto; padding: 20px 16px 48px; }
+  header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  h1 { font: 700 44px/1 Georgia, "Times New Roman", serif; margin: 8px 0 0; letter-spacing: -1px; }
+  .lang { display: flex; gap: 4px; }
+  .lang button {
+    font: inherit; font-size: 15px; padding: 6px 10px; border-radius: 8px; cursor: pointer;
+    background: none; color: var(--muted); border: 1px solid transparent;
+  }
+  .lang button[aria-pressed="true"] { color: var(--ink); border-color: var(--line); background: var(--card); }
+  .tagline { color: var(--muted); margin: 6px 0 20px; }
+  label { display: block; font-weight: 600; margin-bottom: 8px; }
+  textarea {
+    width: 100%; min-height: 150px; padding: 14px; resize: vertical;
+    font: inherit; color: var(--ink); background: var(--card);
+    border: 2px solid var(--line); border-radius: 14px;
+  }
+  textarea:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .row { display: flex; gap: 10px; margin-top: 12px; }
+  button.big {
+    flex: 1; min-height: 58px; font: inherit; font-weight: 700; font-size: 21px;
+    border-radius: 14px; cursor: pointer; border: 2px solid var(--ink);
+    background: var(--ink); color: var(--bg);
+  }
+  button.big.ghost { flex: 0 0 auto; padding: 0 18px; background: none; color: var(--ink); border-color: var(--line); font-weight: 600; font-size: 18px; }
+  button:disabled { opacity: .55; cursor: wait; }
+  .examples { margin-top: 14px; font-size: 16px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .examples button {
+    font: inherit; font-size: 15px; padding: 6px 12px; border-radius: 999px; cursor: pointer;
+    background: none; color: var(--ink); border: 1px solid var(--line);
+  }
+  #result { margin-top: 24px; border-radius: 18px; padding: 22px 20px; border: 2px solid; }
+  #result[hidden] { display: none; }
+  #result.red { background: var(--red-bg); border-color: var(--red); }
+  #result.yellow { background: var(--yellow-bg); border-color: var(--yellow); }
+  #result.green { background: var(--green-bg); border-color: var(--green); }
+  #result.error { background: var(--card); border-color: var(--line); }
+  .badge { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 26px; line-height: 1.15; }
+  .red .badge { color: var(--red); } .yellow .badge { color: var(--yellow); } .green .badge { color: var(--green); }
+  .dot { width: 30px; height: 30px; border-radius: 50%; background: currentColor; flex: none; }
+  .headline { font-size: 23px; font-weight: 600; line-height: 1.3; margin: 14px 0 6px; overflow-wrap: anywhere; }
+  .action { font-size: 21px; margin: 10px 0 0; }
+  .action strong { display: block; font-size: 15px; text-transform: uppercase; letter-spacing: .06em; opacity: .75; }
+  #share { margin-top: 18px; width: 100%; background: none; color: var(--ink); border-color: currentColor; }
+  details { margin-top: 18px; font-size: 16px; }
+  summary { cursor: pointer; font-weight: 600; padding: 6px 0; }
+  details ul { margin: 8px 0; padding-left: 20px; }
+  details li { margin: 4px 0; overflow-wrap: anywhere; }
+  .meter { display: grid; grid-template-columns: minmax(0, 1fr) 90px 44px; gap: 8px; align-items: center; margin: 6px 0; }
+  .bar { height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--ink) 15%, transparent); overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--ink); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .small { font-size: 14px; color: var(--muted); }
+  footer { margin-top: 36px; font-size: 15px; color: var(--muted); }
+  footer p { margin: 6px 0; }
+  .mock { background: var(--yellow-bg); color: var(--yellow); padding: 6px 10px; border-radius: 8px; font-size: 14px; margin-top: 12px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Legit?</h1>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="es">Español</button>
+      <button type="button" data-lang="en">English</button>
+    </div>
+  </header>
+  <p class="tagline" data-t="tagline"></p>
+
+  <form id="form">
+    <label for="text" data-t="label"></label>
+    <textarea id="text" maxlength="4000" required autocomplete="off" spellcheck="false"></textarea>
+    <div class="row">
+      <button class="big ghost" type="button" id="paste" data-t="paste"></button>
+      <button class="big" type="submit" id="go" data-t="go"></button>
+    </div>
+  </form>
+
+  <div class="examples">
+    <span data-t="try"></span>
+    <button type="button" data-ex="scam" data-t="exScam"></button>
+    <button type="button" data-ex="legit" data-t="exLegit"></button>
+  </div>
+
+  <section id="result" hidden aria-live="polite">
+    <div class="badge"><span class="dot" aria-hidden="true"></span><span id="badge"></span></div>
+    <p class="headline" id="headline"></p>
+    <p class="action"><strong data-t="whatToDo"></strong><span id="action"></span></p>
+    <button class="big" type="button" id="share" data-t="share"></button>
+    <details id="why">
+      <summary data-t="why"></summary>
+      <ul id="reasons"></ul>
+      <div id="meters"></div>
+      <p class="small" id="meta"></p>
+    </details>
+    <p class="mock" id="mock" hidden data-t="mock"></p>
+  </section>
+
+  <footer>
+    <p data-t="privacy"></p>
+    <p data-t="limits"></p>
+  </footer>
+</main>
+
+<script>
+const I18N = {
+  es: {
+    tagline: "Pega el mensaje que te ha llegado y te digo si es una estafa.",
+    label: "El mensaje (SMS, WhatsApp o correo)",
+    paste: "Pegar", go: "Comprobar", checking: "Analizando…",
+    try: "Prueba con:", exScam: "SMS falso de un banco", exLegit: "SMS real de un banco",
+    whatToDo: "Qué hacer", why: "Por qué", share: "Enviar a mi hijo o hija",
+    mock: "Modo de pruebas: estas respuestas son simuladas, no vienen de Clef.",
+    privacy: "No guardamos tu mensaje. Se analiza y se olvida.",
+    limits: "Legit? no detecta llamadas ni voces clonadas, y no sustituye a tu banco. Si dudas, llama tú al número oficial.",
+    badge: { red: "Es una estafa", yellow: "Cuidado, no está claro", green: "Parece de fiar" },
+    errors: {
+      empty: "Pega primero el mensaje.", too_long: "El mensaje es demasiado largo. Pega solo la parte importante.",
+      busy: "Hay mucha gente a la vez. Espera unos segundos y vuelve a intentarlo.",
+      unavailable: "Ahora mismo no puedo comprobarlo. Si dudas, no pulses ningún enlace.",
+      clipboard: "No puedo leer el portapapeles. Mantén pulsado el cuadro y elige «Pegar».",
+    },
+    reasons: {
+      brand_link_mismatch: "Parece {brand}, pero el enlace ({domain}) no es de {brand}.",
+      brand_shortener: "Dice ser {brand}, pero esconde el enlace con un acortador ({domain}).",
+      lookalike: "El enlace «{domain}» imita a {brand}, pero no es de {brand}.",
+      lookalike_nobrand: "El enlace «{domain}» imita a una marca conocida.",
+      homoglyph: "El enlace «{domain}» usa letras de otro alfabeto para engañar.",
+      hidden_destination: "El enlace está disfrazado: en realidad lleva a «{domain}».",
+      ip_link: "El enlace lleva a una dirección numérica, no a una web con nombre.",
+      scam_pattern: "Tiene la forma de una estafa conocida ({type}) y te pide datos o dinero.",
+      asks_under_pressure: "Te pide datos o dinero y te mete mucha prisa.",
+      asks_data: "Te pide datos, códigos o dinero.",
+      pressure: "Te mete prisa para que actúes ya.",
+      scam_like: "Se parece a una estafa conocida ({type}).",
+      unknown_link: "No reconozco el enlace «{domain}».",
+      shortener: "El enlace está acortado ({domain}) y no se ve a dónde lleva.",
+      idn_link: "El enlace tiene letras poco habituales.",
+      official_link: "El enlace ({domain}) es de verdad de {brand}.",
+      clean: "No veo señales de estafa en este mensaje.",
+    },
+    types: {
+      bank: "falso banco", delivery: "paquete retenido", account: "cuenta suspendida", prize: "premio falso",
+      family: "familiar en apuros", tech_support: "falso soporte técnico", investment: "inversión milagrosa",
+    },
+    actions: {
+      red: {
+        bank: "No pulses el enlace. Llama al número que viene en tu tarjeta.",
+        delivery: "No pulses ni pagues nada. Si esperas un paquete, míralo en la web oficial escribiéndola tú.",
+        account: "No pulses el enlace. Entra en tu cuenta desde la app o escribiendo tú la dirección.",
+        prize: "No contestes ni des tus datos. Nadie regala premios por mensaje.",
+        family: "No envíes dinero. Llama a tu familiar a su número de siempre.",
+        tech_support: "No llames ni instales nada. Borra el mensaje.",
+        investment: "No envíes dinero ni des tus datos. Borra el mensaje.",
+        default: "No pulses, no contestes y no des ningún dato. Borra el mensaje.",
+      },
+      yellow: "No pulses todavía. Compruébalo por otro camino: la app oficial, el teléfono oficial o alguien de confianza.",
+      green: "Puedes estar tranquilo. Aun así, nunca compartas códigos ni contraseñas con nadie.",
+    },
+    meters: { asks: "Pide datos, códigos o dinero", brand: "Marca: {v}", type: "Patrón: {v}", pressure: "Presión", none: "ninguna", other: "otra" },
+    meta: "Clef respondió a las cuatro preguntas; el código comprobó {n} enlace(s). {ms} ms.",
+    shareText: "¿Me miras esto? Me ha llegado este mensaje:\n\n«{text}»\n\nLegit? dice: {badge}. {headline}",
+    ex: {
+      scam: "BBVA: Hemos detectado un acceso no autorizado. Su cuenta sera bloqueada en 24h. Verifique su identidad ahora: https://bbva-seguridad-clientes.com/verificar",
+      legit: "BBVA: compra de 23,90 EUR en MERCADONA con tu tarjeta *4821. Si no la reconoces, consulta tus movimientos en la app.",
+    },
+  },
+  en: {
+    tagline: "Paste the message you received and I'll tell you if it's a scam.",
+    label: "The message (text, WhatsApp or e-mail)",
+    paste: "Paste", go: "Check", checking: "Checking…",
+    try: "Try:", exScam: "Fake bank text", exLegit: "Real bank text",
+    whatToDo: "What to do", why: "Why", share: "Send to a family member",
+    mock: "Test mode: these answers are simulated, they do not come from Clef.",
+    privacy: "We don't store your message. It is analysed and forgotten.",
+    limits: "Legit? can't detect phone calls or cloned voices, and it doesn't replace your bank. When in doubt, call the official number yourself.",
+    badge: { red: "This is a scam", yellow: "Careful, not clear", green: "Looks legit" },
+    errors: {
+      empty: "Paste the message first.", too_long: "The message is too long. Paste only the important part.",
+      busy: "Too many people at once. Wait a few seconds and try again.",
+      unavailable: "I can't check it right now. When in doubt, don't tap any link.",
+      clipboard: "I can't read the clipboard. Press and hold the box and choose “Paste”.",
+    },
+    reasons: {
+      brand_link_mismatch: "It looks like {brand}, but the link ({domain}) is not {brand}'s.",
+      brand_shortener: "It claims to be {brand}, but hides the link behind a shortener ({domain}).",
+      lookalike: "The link “{domain}” imitates {brand}, but it is not {brand}'s.",
+      lookalike_nobrand: "The link “{domain}” imitates a well-known brand.",
+      homoglyph: "The link “{domain}” uses letters from another alphabet to trick you.",
+      hidden_destination: "The link is disguised: it really goes to “{domain}”.",
+      ip_link: "The link goes to a numeric address, not to a named website.",
+      scam_pattern: "It follows a known scam pattern ({type}) and asks for data or money.",
+      asks_under_pressure: "It asks for data or money and rushes you hard.",
+      asks_data: "It asks for data, codes or money.",
+      pressure: "It rushes you to act now.",
+      scam_like: "It resembles a known scam ({type}).",
+      unknown_link: "I don't recognise the link “{domain}”.",
+      shortener: "The link is shortened ({domain}), so you can't see where it goes.",
+      idn_link: "The link contains unusual letters.",
+      official_link: "The link ({domain}) really belongs to {brand}.",
+      clean: "I see no signs of a scam in this message.",
+    },
+    types: {
+      bank: "fake bank", delivery: "held parcel", account: "suspended account", prize: "fake prize",
+      family: "relative in trouble", tech_support: "fake tech support", investment: "miracle investment",
+    },
+    actions: {
+      red: {
+        bank: "Don't tap the link. Call the number printed on your card.",
+        delivery: "Don't tap or pay anything. If you expect a parcel, check the official website by typing it yourself.",
+        account: "Don't tap the link. Open your account from the app or by typing the address yourself.",
+        prize: "Don't reply or give your details. Nobody hands out prizes by message.",
+        family: "Don't send money. Call your relative on the number you already have.",
+        tech_support: "Don't call or install anything. Delete the message.",
+        investment: "Don't send money or give your details. Delete the message.",
+        default: "Don't tap, don't reply and don't give any details. Delete the message.",
+      },
+      yellow: "Don't tap yet. Check it another way: the official app, the official phone number or someone you trust.",
+      green: "You can relax. Even so, never share codes or passwords with anyone.",
+    },
+    meters: { asks: "Asks for data, codes or money", brand: "Brand: {v}", type: "Pattern: {v}", pressure: "Pressure", none: "none", other: "other" },
+    meta: "Clef answered the four questions; code checked {n} link(s). {ms} ms.",
+    shareText: "Can you look at this? I got this message:\n\n“{text}”\n\nLegit? says: {badge}. {headline}",
+    ex: {
+      scam: "Chase: Unusual sign-in detected. Your account will be locked in 24h. Verify your identity now: https://chase-secure-verify.com/login",
+      legit: "Chase: You made a $23.90 purchase at TARGET with card ending 4821. If you don't recognize it, review your activity in the Chase app.",
+    },
+  },
+};
+
+const $ = (id) => document.getElementById(id);
+const fill = (s, p = {}) => s.replace(/\{(\w+)\}/g, (_, k) => p[k] ?? "");
+let lang = "en";
+let last = null; // last result, so a language switch can re-render it
+
+function pickLang() {
+  try { const saved = localStorage.getItem("lang"); if (I18N[saved]) return saved; } catch {}
+  return (navigator.language || "en").toLowerCase().startsWith("es") ? "es" : "en";
+}
+
+function setLang(next) {
+  lang = next;
+  document.documentElement.lang = lang;
+  try { localStorage.setItem("lang", lang); } catch {}
+  const t = I18N[lang];
+  document.querySelectorAll("[data-t]").forEach((el) => { el.textContent = t[el.dataset.t]; });
+  document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+  if (last) render(last);
+}
+
+function reasonText(r) {
+  const t = I18N[lang];
+  let code = r.code;
+  if (code === "lookalike" && !r.brand) code = "lookalike_nobrand";
+  return fill(t.reasons[code] ?? code, { ...r, type: t.types[r.type] ?? r.type });
+}
+
+function showError(code) {
+  const t = I18N[lang];
+  last = null;
+  const box = $("result");
+  box.className = "error";
+  box.hidden = false;
+  $("badge").textContent = "";
+  box.querySelector(".badge").hidden = true;
+  $("headline").textContent = t.errors[code] ?? t.errors.unavailable;
+  box.querySelector(".action").hidden = true;
+  $("share").hidden = true; $("why").hidden = true; $("mock").hidden = true;
+}
+
+function meter(label, value, max = 1) {
+  const row = document.createElement("div"); row.className = "meter";
+  const name = document.createElement("span"); name.textContent = label;
+  const bar = document.createElement("span"); bar.className = "bar";
+  const fillEl = document.createElement("i"); fillEl.style.width = Math.round(Math.max(0, Math.min(1, value / max)) * 100) + "%";
+  bar.append(fillEl);
+  const num = document.createElement("span"); num.className = "num";
+  num.textContent = max === 1 ? Math.round(value * 100) + "%" : value.toFixed(1) + "/" + max;
+  row.append(name, bar, num);
+  return row;
+}
+
+function render(data) {
+  last = data;
+  const t = I18N[lang];
+  const box = $("result");
+  box.className = data.verdict;
+  box.hidden = false;
+  box.querySelector(".badge").hidden = false;
+  box.querySelector(".action").hidden = false;
+  $("badge").textContent = t.badge[data.verdict];
+  $("headline").textContent = reasonText(data.headline);
+  $("action").textContent = data.verdict === "red"
+    ? (t.actions.red[data.type] ?? t.actions.red.default)
+    : t.actions[data.verdict];
+  $("share").hidden = false;
+  $("why").hidden = false;
+
+  const ul = $("reasons"); ul.replaceChildren();
+  for (const r of data.reasons) { const li = document.createElement("li"); li.textContent = reasonText(r); ul.append(li); }
+
+  const s = data.signals, m = t.meters;
+  const brandLabel = s.brand.id === "none" ? m.none : s.brand.id === "other" ? m.other : (data.brand ?? s.brand.id);
+  const typeLabel = s.type.id === "none" ? m.none : (t.types[s.type.id] ?? s.type.id);
+  $("meters").replaceChildren(
+    meter(m.asks, s.asks),
+    meter(fill(m.brand, { v: brandLabel }), s.brand.p),
+    meter(fill(m.type, { v: typeLabel }), s.type.p),
+    meter(m.pressure, s.pressure, 3),
+  );
+  $("meta").textContent = fill(t.meta, { n: data.links.length, ms: data.ms });
+  $("mock").hidden = !data.mock;
+}
+
+async function check() {
+  const text = $("text").value.trim();
+  if (!text) return showError("empty");
+  const go = $("go");
+  go.disabled = true; go.textContent = I18N[lang].checking;
+  try {
+    const res = await fetch("/api/check", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) showError(data.error ?? "unavailable"); else render(data);
+  } catch {
+    showError("unavailable");
+  } finally {
+    go.disabled = false; go.textContent = I18N[lang].go;
+    $("result").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+}
+
+$("form").addEventListener("submit", (e) => { e.preventDefault(); check(); });
+$("paste").addEventListener("click", async () => {
+  try { const clip = await navigator.clipboard.readText(); if (clip) $("text").value = clip.slice(0, 4000); }
+  catch { showError("clipboard"); $("text").focus(); }
+});
+document.querySelectorAll("[data-ex]").forEach((b) => b.addEventListener("click", () => {
+  $("text").value = I18N[lang].ex[b.dataset.ex]; check();
+}));
+document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => setLang(b.dataset.lang)));
+$("share").addEventListener("click", async () => {
+  if (!last) return;
+  const t = I18N[lang];
+  const text = fill(t.shareText, { text: $("text").value.trim(), badge: t.badge[last.verdict], headline: reasonText(last.headline) });
+  if (navigator.share) { try { await navigator.share({ text }); return; } catch (e) { if (e.name === "AbortError") return; } }
+  window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank", "noopener");
+});
+
+setLang(pickLang());
+</script>
+</body>
+</html>

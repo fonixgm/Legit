@@ -1,0 +1,16 @@
+{
+  "name": "legit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Legit? — paste a suspicious message and find out if it is a scam. Clef decides.",
+  "scripts": {
+    "dev": "node dev.mjs",
+    "test": "node --test",
+    "eval": "node eval/run.mjs"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "tldts": "^7.0.0"
+  }
+}
