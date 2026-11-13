@@ -23,6 +23,11 @@ export default async function handler(req, res) {
     // Log the failure, never the message.
     console.error("check failed:", status, err?.name, err instanceof ClefError ? err.message : "");
     if (status === 429) return res.status(503).json({ error: "busy" });
-    return res.status(502).json({ error: "unavailable" });
+    // `detail` says why without leaking anything: missing key, Clef's HTTP status or a timeout.
+    let detail = err?.name === "TimeoutError" ? "timeout" : "internal";
+    if (err instanceof ClefError) detail = status === 500 ? "no_key" : `clef_${status}`;
+    const body = { error: "unavailable", detail };
+    if (status === 400) body.message = err.message.slice(0, 300); // Clef explains what is wrong with the request
+    return res.status(502).json(body);
   }
 }

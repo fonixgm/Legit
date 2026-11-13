@@ -349,7 +349,7 @@ async function check() {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }),
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) showError(data.error ?? "unavailable"); else render(data);
+    if (!res.ok) { showError(data.error ?? "unavailable"); if (data.detail) console.warn("Legit?", data.detail, data.message ?? ""); } else render(data);
   } catch {
     showError("unavailable");
   } finally {
