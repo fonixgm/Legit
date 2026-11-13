@@ -6,7 +6,7 @@ Pegas el mensaje que te ha llegado (SMS, WhatsApp o correo) y en un segundo te d
 
 > «Parece Amazon, pero el enlace no es de Amazon. No pulses.»
 
-Pensado para una persona mayor: un color (rojo, amarillo o verde), una frase y una instrucción. Si duda, un botón para enviárselo a un familiar.
+Pensado para una persona mayor: un color (rojo, amarillo o verde), tres preguntas con respuesta sí/no (¿te pide datos?, ¿dice ser alguien?, ¿el enlace es de verdad suyo?), una instrucción y un botón para que se lo lea en voz alta. Si duda, otro para enviárselo a un familiar.
 
 ## Cómo decide
 
@@ -27,13 +27,19 @@ Sin Clef no hay veredicto: es quien dice qué marca se está suplantando, y sin 
 
 ## Medición
 
-**Todavía no hay cifra.** La medición se hace con 30 estafas reales (anonimizadas y con los enlaces neutralizados) y 30 mensajes legítimos en `eval/cases.jsonl`:
+**Todavía no hay cifra.** La medición se hace con 30 estafas reales (anonimizadas y con los enlaces neutralizados) y 30 mensajes legítimos en `eval/cases.jsonl`. Cómo recogerlos: [`eval/README.md`](eval/README.md).
 
 ```bash
-NAN_KEY=... npm run eval
+npm run eval:check          # valida el conjunto: 30 + 30, sin enlaces vivos ni datos personales
+NAN_KEY=... npm run eval    # mide
 ```
 
-Escribe `eval/RESULTS.md` con aciertos, falsos avisos y los casos en los que falla. Los umbrales de [`lib/verdict.js`](lib/verdict.js) se ajustan con esa medición, no a ojo. `eval/cases.sample.jsonl` son ejemplos inventados para probar el script, no cuentan.
+Sobre los mismos mensajes corren dos brazos, con el mismo chequeo de enlaces y las mismas reglas:
+
+- **baseline**: adivinanzas por palabras clave (`lib/mock.js`) en lugar de Clef.
+- **clef**: Clef de verdad.
+
+`eval/RESULTS.md` pone los dos lado a lado con aciertos, falsos avisos y los casos en los que falla. La diferencia entre los dos brazos es lo que aporta Clef; si es pequeña, hay que decirlo. Sin `NAN_KEY` solo corre el baseline y el informe lo avisa. Los umbrales de [`lib/verdict.js`](lib/verdict.js) se ajustan con un conjunto aparte, no con el de prueba. `eval/cases.sample.jsonl` son ejemplos inventados para probar el script, no cuentan.
 
 ## Lo que no hace
 
@@ -66,5 +72,6 @@ lib/clef.js         las cuatro preguntas y la llamada a Clef
 lib/links.js        extracción y comprobación de enlaces
 lib/brands.js       marcas, dominios oficiales y acortadores
 lib/verdict.js      reglas y umbrales
-eval/run.mjs        medición
+eval/run.mjs        medición con y sin Clef
+eval/check-cases.mjs valida el conjunto de medición
 ```
