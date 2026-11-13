@@ -9,7 +9,7 @@
     "test": "node --test",
     "eval": "node eval/run.mjs"
   },
-  "engines": { "node": ">=20" },
+  "engines": { "node": "22.x" },
   "dependencies": {
     "tldts": "^7.0.0"
   }
