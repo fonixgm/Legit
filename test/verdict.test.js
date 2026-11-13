@@ -80,3 +80,11 @@ test("readAnswers parses the documented Clef response shape", () => {
   const q = buildQuestions();
   for (const k of ["brand_online", "brand_money", "scam_type"]) assert.ok(Object.keys(q[k].criteria).length <= 26, k);
 });
+
+test("result says whether every link is the claimed brand's (the web's third question)", () => {
+  const own = run(clef({ brand: { id: "amazon", p: 0.95 } }), "https://www.amazon.com/orders");
+  assert.equal(own.own, true);
+  const foreign = run(clef({ asks: 0.9, brand: { id: "amazon", p: 0.95 } }), "https://secure-login.xyz/a");
+  assert.equal(foreign.own, false);
+  assert.equal(run(clef(), "hola").own, false);
+});
