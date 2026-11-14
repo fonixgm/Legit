@@ -1,6 +1,7 @@
 // Measures Legit? against a labelled set of messages, with and without Clef.
 //   NAN_KEY=... npm run eval                      -> eval/cases.jsonl
 //   NAN_KEY=... npm run eval -- eval/other.jsonl
+//   LEGIT_URL=https://... npm run eval            -> measures the deployed app
 //   npm run eval                                  -> baseline only (no key needed)
 // One JSON object per line: { "id": "s01", "label": "scam" | "legit", "text": "...", "source": "..." }
 // Two arms over the same messages, same link check, same rules:
@@ -13,18 +14,38 @@ import { checkMessage } from "../lib/check.js";
 
 const file = process.argv[2] ?? "eval/cases.jsonl";
 const mock = process.env.CLEF_MOCK === "1";
-const hasClef = mock || Boolean(process.env.NAN_KEY);
+const hasClef = mock || Boolean(process.env.NAN_KEY) || Boolean(process.env.LEGIT_URL);
 
 const cases = (await readFile(file, "utf8"))
   .split("\n")
   .filter((l) => l.trim() && !l.startsWith("//"))
   .map((l) => JSON.parse(l));
 
+// LEGIT_URL=https://... measures the DEPLOYED app (same code, the server's key) instead of
+// calling Clef from here. It paces itself under the per-visitor rate limit.
+const remote = process.env.LEGIT_URL?.replace(/\/$/, "");
+const pause = (ms) => new Promise((r) => setTimeout(r, ms));
+async function checkRemote(text) {
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const res = await fetch(`${remote}/api/check`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok) {
+      if (!data.cached) await pause(5200);
+      return data;
+    }
+    if (res.status !== 429 && res.status !== 503) throw new Error(`HTTP ${res.status} ${data.detail ?? data.error ?? ""}`);
+    await pause(((data.retryAfter ?? 3) + 1) * 1000);
+  }
+  throw new Error("still busy after retries");
+}
+
 async function runArm(baseline) {
   const rows = [];
   for (const c of cases) {
     try {
-      const r = await checkMessage(c.text, { baseline });
+      const r = !baseline && remote ? await checkRemote(c.text) : await checkMessage(c.text, { baseline });
       rows.push({ ...c, verdict: r.verdict, reason: r.headline.code, ms: r.ms });
     } catch (err) {
       rows.push({ ...c, verdict: "error", reason: String(err.message).slice(0, 60), ms: 0 });
