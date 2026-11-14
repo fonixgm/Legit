@@ -157,3 +157,12 @@ test("'hi mum, new number, write to me' (no money asked yet) warns instead of cl
   // an ordinary family message stays green
   assert.equal(run(clef({ calls: 0.3, pressure: 0.1 }), "Mamá, voy tarde, cenad sin mí.").verdict, "green");
 });
+
+test("brand + request + a link that forwards elsewhere = red, like a shortener", () => {
+  const c = clef({ asks: 0.99, brand: { id: "microsoft", p: 0.88 }, type: { id: "account", p: 0.84 }, pressure: 1.9 });
+  const r = run(c, "https://www.google.com/url?q=https://ms-login-portal.example.com");
+  assert.equal(r.verdict, "red");
+  assert.equal(r.headline.code, "brand_redirect");
+  // Without a brand claim it is only a warning.
+  assert.equal(run(clef(), "https://www.google.com/url?q=https://example.com").verdict, "yellow");
+});
