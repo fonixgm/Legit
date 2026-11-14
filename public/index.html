@@ -50,6 +50,9 @@
     cursor: pointer; border: 3px solid var(--ink); border-radius: 0; background: var(--ink); color: var(--bg);
   }
   button.big.ghost { flex: 0 0 auto; background: none; color: var(--ink); padding: 0 24px; font-weight: 500; }
+  button.big.shot { flex: 1 1 100%; }
+  .shotnote { margin: 12px 0 0; font-size: 16px; color: var(--muted); }
+  body.dragging textarea { outline: 3px dashed var(--ink); outline-offset: 4px; }
   button.big:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
   button:disabled { opacity: .55; cursor: wait; }
   .examples { margin-top: 20px; font-size: 17px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: baseline; }
@@ -121,6 +124,11 @@
       <button class="big ghost" type="button" id="paste" data-t="paste"></button>
       <button class="big" type="submit" id="go" data-t="go"></button>
     </div>
+    <div class="row">
+      <button class="big ghost shot" type="button" id="shot" data-t="shot"></button>
+      <input type="file" id="file" accept="image/*" hidden>
+    </div>
+    <p class="shotnote" id="shotnote" hidden aria-live="polite"></p>
   </form>
 
   <div class="examples">
@@ -166,7 +174,11 @@ const I18N = {
     word: { red: "Estafa.", yellow: "Cuidado.", green: "Nada raro." },
     tagline: "Pega el mensaje que te ha llegado y te digo si es una estafa.",
     label: "El mensaje (SMS, WhatsApp o correo)",
-    paste: "Pegar", go: "Comprobar", checking: "Analizando…", queued: "Hay cola, un momento…",
+    paste: "Pegar", go: "Comprobar", shot: "📷 Subir una captura",
+    shotLoading: "Preparando el lector de capturas… (solo la primera vez)", shotReading: "Leyendo la captura… {pct}%",
+    shotDone: "Esto es lo que he leído en la captura. Si el enlace no está bien copiado, corrígelo y pulsa Comprobar.",
+    shotEmpty: "No he podido leer texto en esa imagen. Prueba con una captura más nítida o pega el texto.",
+    shotFail: "No he podido leer la captura. Pega el texto del mensaje.", checking: "Analizando…", queued: "Hay cola, un momento…",
     try: "Prueba con:", exScam: "SMS falso de un banco", exLegit: "SMS real de un banco",
     whatToDo: "Qué hacer", why: "Por qué", share: "Enviar a mi hijo o hija",
     speak: "🔊 Leérmelo en voz alta", stopSpeak: "⏹ Parar",
@@ -242,7 +254,11 @@ const I18N = {
     word: { red: "Scam.", yellow: "Careful.", green: "Looks OK." },
     tagline: "Paste the message you received and I'll tell you if it's a scam.",
     label: "The message (text, WhatsApp or e-mail)",
-    paste: "Paste", go: "Check", checking: "Checking…", queued: "In line, one moment…",
+    paste: "Paste", go: "Check", shot: "📷 Upload a screenshot",
+    shotLoading: "Getting the screenshot reader ready… (first time only)", shotReading: "Reading the screenshot… {pct}%",
+    shotDone: "This is what I read in the screenshot. If the link is not copied right, fix it and press Check.",
+    shotEmpty: "I could not read any text in that image. Try a sharper screenshot or paste the text.",
+    shotFail: "I could not read the screenshot. Paste the text of the message.", checking: "Checking…", queued: "In line, one moment…",
     try: "Try:", exScam: "Fake bank text", exLegit: "Real bank text",
     whatToDo: "What to do", why: "Why", share: "Send to a family member",
     speak: "🔊 Read it to me", stopSpeak: "⏹ Stop",
@@ -322,7 +338,10 @@ let last = null; // last result, so a language switch can re-render it
 
 function pickLang() {
   try { const saved = localStorage.getItem("lang"); if (I18N[saved]) return saved; } catch {}
-  return (navigator.language || "en").toLowerCase().startsWith("es") ? "es" : "en";
+  // Spanish if ANY of the browser's preferred languages is one spoken in Spain or Latin
+  // America (many people keep the phone in English or Catalan); English for everyone else.
+  const prefs = (navigator.languages?.length ? navigator.languages : [navigator.language || "en"]).map((l) => l.toLowerCase());
+  return prefs.some((l) => /^(es|ca|gl|eu)\b/.test(l)) ? "es" : "en";
 }
 
 function setLang(next) {
@@ -493,8 +512,85 @@ async function check() {
 
 $("form").addEventListener("submit", (e) => { e.preventDefault(); check(); });
 $("paste").addEventListener("click", async () => {
+  // A copied screenshot comes as an image, a copied message as text.
+  try {
+    for (const item of await navigator.clipboard.read()) {
+      const type = item.types.find((t) => t.startsWith("image/"));
+      if (type) return readShot(await item.getType(type));
+    }
+  } catch {}
   try { const clip = await navigator.clipboard.readText(); if (clip) $("text").value = clip.slice(0, 4000); }
   catch { showError("clipboard"); $("text").focus(); }
+});
+
+// ---- Screenshots. The image never leaves the phone: the text is read here, in the browser
+// (Tesseract.js), put in the box so it can be seen and corrected, and checked like any message.
+const OCR_SRC = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
+let ocrWorker = null;
+let ocrProgress = () => {};
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const el = document.createElement("script");
+    el.src = src; el.onload = resolve; el.onerror = () => reject(new Error("script"));
+    document.head.append(el);
+  });
+}
+async function getOcr() {
+  if (!ocrWorker) {
+    ocrWorker = (async () => {
+      if (!window.Tesseract) await loadScript(OCR_SRC);
+      return Tesseract.createWorker(["spa", "eng"], 1, { logger: (m) => ocrProgress(m) });
+    })();
+    ocrWorker.catch(() => { ocrWorker = null; });
+  }
+  return ocrWorker;
+}
+// Big photos are slow to read and small text reads badly: bring the image to a sane width.
+async function prepareImage(blob) {
+  const bmp = await createImageBitmap(blob);
+  const scale = bmp.width > 1600 ? 1600 / bmp.width : bmp.width < 700 ? 2 : 1;
+  if (scale === 1) return blob;
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bmp.width * scale); canvas.height = Math.round(bmp.height * scale);
+  canvas.getContext("2d").drawImage(bmp, 0, 0, canvas.width, canvas.height);
+  return new Promise((resolve) => canvas.toBlob((b) => resolve(b ?? blob), "image/png"));
+}
+let reading = false;
+async function readShot(blob) {
+  if (reading || !blob) return;
+  reading = true;
+  const t = () => I18N[lang];
+  const note = $("shotnote"), shot = $("shot"), go = $("go");
+  shot.disabled = true; go.disabled = true;
+  note.hidden = false; note.textContent = t().shotLoading;
+  ocrProgress = (m) => { if (m.status === "recognizing text") note.textContent = fill(t().shotReading, { pct: Math.round((m.progress || 0) * 100) }); };
+  try {
+    const [worker, image, tidy] = await Promise.all([getOcr(), prepareImage(blob).catch(() => blob), import("/ocr-text.js")]);
+    const { data } = await worker.recognize(image);
+    const text = tidy.cleanOcrText(data.text || "");
+    if (text.replace(/\s/g, "").length < 8) { note.textContent = t().shotEmpty; return; }
+    $("text").value = text;
+    note.textContent = t().shotDone;
+    shot.disabled = false; go.disabled = false;
+    await check();
+  } catch {
+    note.textContent = t().shotFail;
+  } finally {
+    reading = false; shot.disabled = false; go.disabled = false; $("file").value = "";
+  }
+}
+$("shot").addEventListener("click", () => $("file").click());
+$("file").addEventListener("change", (e) => readShot(e.target.files[0]));
+document.addEventListener("paste", (e) => {
+  const img = [...(e.clipboardData?.files ?? [])].find((f) => f.type.startsWith("image/"));
+  if (img) { e.preventDefault(); readShot(img); }
+});
+document.addEventListener("dragover", (e) => { e.preventDefault(); document.body.classList.add("dragging"); });
+document.addEventListener("dragleave", () => document.body.classList.remove("dragging"));
+document.addEventListener("drop", (e) => {
+  e.preventDefault(); document.body.classList.remove("dragging");
+  const img = [...(e.dataTransfer?.files ?? [])].find((f) => f.type.startsWith("image/"));
+  if (img) readShot(img);
 });
 document.querySelectorAll("[data-ex]").forEach((b) => b.addEventListener("click", () => {
   $("text").value = I18N[lang].ex[b.dataset.ex]; check();
