@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { decide } from "../lib/verdict.js";
 import { extractLinks } from "../lib/links.js";
-import { buildQuestions, readAnswers, ClefError } from "../lib/clef.js";
+import { buildQuestions, readAnswers, ClefError, BRAND_QUESTIONS } from "../lib/clef.js";
 
 // Clef answers are faked here on purpose: these tests pin the RULES, not the model.
 const clef = (o = {}) => ({
@@ -79,7 +79,7 @@ test("readAnswers parses the documented Clef response shape", () => {
   });
   assert.deepEqual(a, { asks: 0.94, calls: 0.2, brand: { id: "amazon", p: 0.93 }, type: { id: "account", p: 0.7 }, pressure: 2.6, pressureConfidence: 0.7 });
   const q = buildQuestions();
-  for (const k of ["brand_online", "brand_money", "scam_type"]) assert.ok(Object.keys(q[k].criteria).length <= 26, k);
+  for (const k of [...BRAND_QUESTIONS, "scam_type"]) assert.ok(Object.keys(q[k].criteria).length <= 26, k);
 });
 
 test("result says whether every link is the claimed brand's (the web's third question)", () => {
@@ -127,4 +127,23 @@ test("a call request with pressure but no named brand is only yellow", () => {
   const r = run(clef({ calls: 0.9, pressure: 2.3 }), "Llame urgentemente al 912 345 678.");
   assert.equal(r.verdict, "yellow");
   assert.equal(r.headline.code, "call_pressure");
+});
+
+test("Spanish and Latin American brands: official domains clear, look-alikes do not", () => {
+  const off = (u) => extractLinks(u)[0];
+  assert.equal(off("https://www.bancsabadell.com/x").kind, "official");
+  assert.equal(off("https://www.unicajabanco.es").brand, "unicaja");
+  assert.equal(off("https://sede.agenciatributaria.gob.es/").brand, "aeat");
+  assert.equal(off("https://www.ruralvia.com").brand, "cajarural");
+  for (const [u, b] of [["https://bancsabadell-seguridad.com", "sabadell"], ["https://laboral-kutxa-online.top", "laboralkutxa"], ["https://dgt-multas-pago.com", "dgt"], ["https://nequi-verifica.co", "nequi"], ["https://agenciatributaria-devolucion.info", "aeat"]]) {
+    const l = off(u);
+    assert.equal(l.kind, "lookalike", u);
+    assert.equal(l.brand, b, u);
+  }
+});
+
+test("every brand group fits in one Clef choice question", () => {
+  const q = buildQuestions();
+  for (const k of BRAND_QUESTIONS) assert.ok(Object.keys(q[k].criteria).length <= 26, k);
+  assert.ok(BRAND_QUESTIONS.length >= 4);
 });
