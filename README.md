@@ -56,7 +56,18 @@ Las dos mediciones se repitieron contra la web desplegada ([`eval/RESULTS-v2.md`
 
 - **v2: idéntica.** 19/30 estafas en rojo, 1/30 en verde, 29/30 legítimos en verde, 0/30 en rojo.
 - **v1: de 9 a 7 estafas en verde**, por la regla del «hijo en apuros». No es una mejora limpia: esa regla se escribió mirando los fallos de la v1.
-- Lo añadido después (webs conocidas, capturas, apuestas y dinero fácil) solo actúa sobre mensajes con enlace, y ningún legítimo de estos conjuntos lleva enlace, así que no cambia estas cifras.
+- Lo añadido después (webs conocidas, apuestas y dinero fácil, «llama a este número») se volvió a medir con Clef el 14 nov: v2 sigue en 1/30 estafas en verde y 0/30 legítimos en rojo; los legítimos en verde salen 29 o 30 de 30 según la pasada, porque Clef varía un poco de una vez a otra.
+
+### Capturas (14 nov 2026)
+
+Con una captura, Clef recibe la imagen y no hay texto. Se comparó sobre los mismos 28 mensajes con enlace (12 del conjunto de ajuste, 8 de ejemplo, 7 de la demo y una captura real de Google Messages), escritos y en captura:
+
+| | Acierta (estafa en rojo, legítimo en verde) | Amarillo | Estafa en verde o legítimo en rojo |
+|---|---|---|---|
+| Texto pegado | 23 | 5 | 0 |
+| Captura | 24 | 2 | **2** |
+
+Los dos fallos en captura: el Apple con letras cirílicas (invisible en una imagen) y una «llamada de vuelta» de un falso banco, que se corrigió con una regla nueva (un banco o mensajería que te manda llamar a un número da al menos amarillo). Las capturas de prueba son generadas, no reales, salvo una: es una indicación, no una cifra.
 
 ### v1 — 14 nov 2026 · 60 mensajes · una sola pasada
 
@@ -120,7 +131,7 @@ Cómo se recogen los casos: [`eval/README.md`](eval/README.md). `eval/tuning.jso
 - No sustituye a tu banco.
 - No comprueba números de teléfono ni abre los enlaces.
 - No guarda los mensajes: se analizan en el servidor y no se escriben en disco ni en los logs. El veredicto se recuerda unos minutos en memoria, bajo un hash del texto, para no repetir la consulta si varias personas comprueban el mismo mensaje.
-- Las capturas se leen en el propio navegador (OCR con Tesseract.js) y la imagen no se envía a ningún sitio. De la pantalla se descarta la interfaz del móvil (hora, remitente, fechas, avisos de spam de la app) y se comprueba solo el mensaje, que queda a la vista para corregirlo. Un enlace mal leído puede dar un aviso equivocado. Clef no ve la imagen: recibe el texto y sabe que viene de una captura.
+- Las capturas las mira Clef directamente: el móvil la reduce de tamaño y la envía a Clef a través de NaN, sin guardarla en ningún sitio. Como no hay texto, el código no puede comprobar el dominio del enlace: se lo pregunta a Clef («¿hay un enlace?», «¿tiene mala pinta?»). Funciona con enlaces raros, acortadores o nombres de marca alterados, pero no ve trucos invisibles como letras cirílicas (`аррӏе.com` parece `apple.com` en una imagen). Para eso, mejor pegar el texto.
 
 ## Ejecutarlo
 

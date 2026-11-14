@@ -12,7 +12,7 @@ Set: `eval/cases.jsonl` · 60 messages (30 scams, 30 legitimate) · date 2026-11
 
 `baseline` = same link check and same rules, but keyword guesses (`lib/mock.js`) instead of Clef. What `clef` gains over it is what the model adds.
 
-Median latency with Clef: 736 ms per message.
+Median latency with Clef: 619 ms per message.
 
 ## baseline
 

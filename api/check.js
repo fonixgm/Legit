@@ -1,9 +1,9 @@
-// POST /api/check  { "text": "..." }  ->  verdict JSON
+// POST /api/check  { "text": "..." } or { "image": "data:image/jpeg;base64,..." }  ->  verdict JSON
 // Runs on the server so the NaN key never reaches the browser.
-// The message is not stored and not logged (only its verdict is remembered for a few
-// minutes, under a hash of the text: see lib/limits.js).
+// The message or screenshot is not stored and not logged (only its verdict is remembered for
+// a few minutes, under a hash of it: see lib/limits.js). A screenshot goes to Clef through NaN.
 
-import { checkMessage, MAX_CHARS } from "../lib/check.js";
+import { checkMessage, isImageDataUrl, MAX_CHARS } from "../lib/check.js";
 import { ClefError } from "../lib/clef.js";
 import { clientIp, rateLimiter, resultCache } from "../lib/limits.js";
 
@@ -17,11 +17,14 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "method_not_allowed" });
   }
 
+  const image = req.body?.image;
+  if (image !== undefined && !isImageDataUrl(image)) return res.status(400).json({ error: "bad_image" });
   const text = typeof req.body?.text === "string" ? req.body.text.trim() : "";
-  if (!text) return res.status(400).json({ error: "empty" });
+  if (!text && !image) return res.status(400).json({ error: "empty" });
   if (text.length > MAX_CHARS) return res.status(413).json({ error: "too_long", max: MAX_CHARS });
 
-  const cached = cache.get(text);
+  const key = image ?? text;
+  const cached = cache.get(key);
   if (cached) return res.status(200).json({ ...cached, cached: true });
 
   const turn = allow(clientIp(req));
@@ -31,8 +34,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const result = await checkMessage(text);
-    cache.set(text, result);
+    const result = await checkMessage(text, { image });
+    cache.set(key, result);
     return res.status(200).json(result);
   } catch (err) {
     const status = err instanceof ClefError ? err.status : 0;

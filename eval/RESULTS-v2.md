@@ -7,12 +7,12 @@ Set: `eval/cases-v2.jsonl` · 60 messages (30 scams, 30 legitimate) · date 2026
 | Arm | Scams caught (red) | Scams missed (green) | Legit cleared (green) | False alarms (legit red) | Errors |
 |---|---|---|---|---|---|
 | baseline (no Clef) | 9/30 (30%) | 8/30 (27%) | 28/30 (93%) | 0/30 (0%) | 0 |
-| clef | 19/30 (63%) | 1/30 (3%) | 29/30 (97%) | 0/30 (0%) | 0 |
+| clef | 19/30 (63%) | 1/30 (3%) | 30/30 (100%) | 0/30 (0%) | 0 |
 
 
 `baseline` = same link check and same rules, but keyword guesses (`lib/mock.js`) instead of Clef. What `clef` gains over it is what the model adds.
 
-Median latency with Clef: 725 ms per message.
+Median latency with Clef: 620 ms per message.
 
 ## baseline
 
@@ -37,7 +37,7 @@ Median latency with Clef: 725 ms per message.
 | | Red | Yellow | Green | Error |
 |---|---|---|---|---|
 | **Scams** (30) | 19 | 10 | 1 | 0 |
-| **Legitimate** (30) | 0 | 1 | 29 | 0 |
+| **Legitimate** (30) | 0 | 0 | 30 | 0 |
 
 ### Where it fails
 
@@ -83,7 +83,7 @@ Median latency with Clef: 725 ms per message.
 | uci2-04 | legit | green | green |
 | uci2-05 | legit | green | green |
 | uci2-06 | legit | green | green |
-| uci2-07 | legit | yellow | yellow |
+| uci2-07 | legit | yellow | green |
 | uci2-08 | legit | green | green |
 | uci2-09 | legit | green | green |
 | uci2-10 | legit | green | green |
