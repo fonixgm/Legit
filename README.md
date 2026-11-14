@@ -28,6 +28,23 @@ Sin Clef no hay veredicto: es quien dice qué marca se está suplantando, y sin 
 
 ## Medición
 
+### v2 — 14 nov 2026 · 60 mensajes nuevos · tras arreglar la regla de «hijo en apuros»
+
+Resultado: [`eval/RESULTS-v2.md`](eval/RESULTS-v2.md). Conjunto: [`eval/cases-v2.jsonl`](eval/cases-v2.jsonl), fijado en git (commit `b5d8b58`) antes de medir y **sin ningún mensaje de la v1**. La regla se cambió mirando los fallos de la v1; por eso se mide con mensajes que nunca se vieron.
+
+| | Estafas en rojo | Estafas en amarillo | **Estafas en verde (el error caro)** | Legítimos en verde | Legítimos en rojo |
+|---|---|---|---|---|---|
+| **Legit? con Clef** | 19/30 | 10/30 | **1/30** | 29/30 | 0/30 |
+| Sin Clef (palabras clave) | 9/30 | 13/30 | 8/30 | 28/30 | 0/30 |
+
+Mediana de latencia con Clef: 521 ms por mensaje.
+
+- **«Hijo en apuros» (3 mensajes reales citados por Maldita.es):** 2 en amarillo con «llama a tu familiar a su número de siempre», 1 en verde. Sin Clef, los 3 salen en verde.
+- **La que se escapa** (`md-hijo-01`, «Tengo un número temporal… ¿puedes enviar un mensaje de WhatsApp?»): Clef ve el patrón familiar (0,90) pero puntúa «te pide contactar» con 0,57, justo bajo el umbral de 0,6. Candidato a mejorar, que habrá que validar con un conjunto v3, no con este.
+- **El legítimo en amarillo** (`uci2-07`) pregunta qué datos de cuenta hacen falta para una transferencia: el aviso es razonable.
+- **Composición:** 21 de las 30 estafas son SMS bancarios de INCIBE (más fáciles: nombran el banco y piden verificar). La v2 no es más difícil que la v1, es distinta; no se puede leer «de 9 a 1» como mejora pura de la regla.
+- Mismas limitaciones que la v1: legítimos informales en inglés y estafas sin enlace.
+
 ### v1 — 14 nov 2026 · 60 mensajes · una sola pasada
 
 Resultado completo, caso por caso: [`eval/RESULTS.md`](eval/RESULTS.md). Conjunto: [`eval/cases.jsonl`](eval/cases.jsonl), fijado y guardado en git (commit `357988e`) **antes** de medir, con una regla escrita en su cabecera.
