@@ -50,13 +50,17 @@ Rojo: el enlace empieza por google.com, pero te reenvía a otra web.
 
 ## 5. Los números (35 s)
 
-> «Lo medimos con 60 mensajes reales que nadie había visto: estafas citadas por INCIBE y Maldita, y SMS legítimos.»
+> «Lo medimos con mensajes reales que nadie había visto: estafas citadas por INCIBE y Maldita, y SMS legítimos. El último conjunto lo guardamos en git antes de tocar las reglas.»
 
-| Estafas que pasan en verde | Sin Clef | Con Clef |
+| Último conjunto (v3, 25 estafas + 25 legítimos) | Antes | Ahora |
 |---|---|---|
-| v2 (30 estafas) | 8 | **1** |
+| Estafas detectadas en rojo | 20 | **25** |
+| Estafas que pasan en verde | 0 | **0** |
+| Mensajes legítimos en rojo | 0 | **0** |
 
-> «Y 0 mensajes legítimos en rojo. Sin Clef, la app no sirve: Clef toma la decisión.»
+> «Y en el conjunto anterior, sin Clef se escapaban 8 de 30 estafas en verde; con Clef, ninguna.»
+
+Si preguntan: las estafas de INCIBE vienen sin el enlace (lo quita la fuente), y los legítimos son SMS informales en inglés. Está todo en el README.
 
 Cifras y limitaciones: [README.md](README.md#medición). Enlaces medidos aparte con 45.387 enlaces de phishing activos de PhishTank: solo 3 pasan como enlace oficial de la marca.
 

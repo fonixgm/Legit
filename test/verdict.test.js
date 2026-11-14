@@ -73,13 +73,14 @@ test("readAnswers parses the documented Clef response shape", () => {
       asks: { type: "noul", noul: 0.94 },
       calls: { type: "noul", noul: 0.2 },
       lure: { type: "noul", noul: 0.1 },
+      via_link: { type: "noul", noul: 0.2 }, new_number: { type: "noul", noul: 0.05 }, only_code: { type: "noul", noul: 0.05 },
       brand_online: { type: "choice", choice: "amazon", probabilities: { amazon: 0.93, none: 0.07 }, confidence: 0.9 },
       brand_money: { type: "choice", choice: "other", probabilities: { other: 0.6, none: 0.4 }, confidence: 0.5 },
       scam_type: { type: "choice", choice: "account", probabilities: { account: 0.7 }, confidence: 0.6 },
       pressure: { type: "score", score: 2.6, confidence: 0.7 },
     },
   });
-  assert.deepEqual(a, { asks: 0.94, calls: 0.2, lure: 0.1, brand: { id: "amazon", p: 0.93 }, type: { id: "account", p: 0.7 }, pressure: 2.6, pressureConfidence: 0.7 });
+  assert.deepEqual(a, { asks: 0.94, calls: 0.2, lure: 0.1, via: 0.2, newNumber: 0.05, onlyCode: 0.05, brand: { id: "amazon", p: 0.93 }, type: { id: "account", p: 0.7 }, pressure: 2.6, pressureConfidence: 0.7 });
   const q = buildQuestions();
   for (const k of [...BRAND_QUESTIONS, "scam_type"]) assert.ok(Object.keys(q[k].criteria).length <= 26, k);
 });
@@ -94,9 +95,9 @@ test("result says whether every link is the claimed brand's (the web's third que
 
 test("a missing or malformed Clef answer is an error, never a green verdict", () => {
   const ok = {
-    asks: { noul: 0.1 }, calls: { noul: 0.1 }, lure: { noul: 0.1 }, scam_type: { choice: "none" }, pressure: { score: 0 }, brand_online: { choice: "none" }, brand_money: { choice: "none" },
+    asks: { noul: 0.1 }, calls: { noul: 0.1 }, lure: { noul: 0.1 }, via_link: { noul: 0.1 }, new_number: { noul: 0.05 }, only_code: { noul: 0.05 }, scam_type: { choice: "none" }, pressure: { score: 0 }, brand_online: { choice: "none" }, brand_money: { choice: "none" },
   };
-  for (const bad of [{}, null, undefined, { answers: {} }, { answers: { ...ok, asks: undefined } }, { answers: { ...ok, calls: undefined } }, { answers: { ...ok, lure: undefined } }, { answers: { ...ok, pressure: { score: "high" } } }, { answers: { ...ok, scam_type: {} } }]) {
+  for (const bad of [{}, null, undefined, { answers: {} }, { answers: { ...ok, asks: undefined } }, { answers: { ...ok, calls: undefined } }, { answers: { ...ok, lure: undefined } }, { answers: { ...ok, via_link: undefined } }, { answers: { ...ok, pressure: { score: "high" } } }, { answers: { ...ok, scam_type: {} } }]) {
     assert.throws(() => readAnswers(bad), ClefError);
   }
   assert.doesNotThrow(() => readAnswers({ answers: ok }));

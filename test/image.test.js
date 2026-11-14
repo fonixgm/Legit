@@ -23,7 +23,7 @@ test("with a screenshot Clef is also asked about the link, and must answer", () 
   assert.ok(buildQuestions({ image: true }).has_link && buildQuestions({ image: true }).link_odd);
   assert.equal(buildQuestions().has_link, undefined);
   const base = {
-    asks: { noul: 0.1 }, calls: { noul: 0.1 }, lure: { noul: 0.1 }, scam_type: { choice: "none" }, pressure: { score: 0 }, brand_online: { choice: "none" },
+    asks: { noul: 0.1 }, calls: { noul: 0.1 }, lure: { noul: 0.1 }, via_link: { noul: 0.1 }, new_number: { noul: 0.05 }, only_code: { noul: 0.05 }, scam_type: { choice: "none" }, pressure: { score: 0 }, brand_online: { choice: "none" },
   };
   assert.throws(() => readAnswers({ answers: base }, { image: true }), ClefError);
   const a = readAnswers({ answers: { ...base, has_link: { noul: 0.9 }, link_odd: { noul: 0.8 } } }, { image: true });
@@ -59,7 +59,7 @@ test("the screenshot itself is what Clef receives", async () => {
   globalThis.fetch = async (_url, init) => {
     sent = JSON.parse(init.body);
     const answers = {
-      asks: { noul: 0.1 }, calls: { noul: 0.1 }, lure: { noul: 0.9 }, scam_type: { choice: "prize", probabilities: { prize: 0.8 } },
+      asks: { noul: 0.1 }, calls: { noul: 0.1 }, lure: { noul: 0.9 }, via_link: { noul: 0.1 }, new_number: { noul: 0.05 }, only_code: { noul: 0.05 }, scam_type: { choice: "prize", probabilities: { prize: 0.8 } },
       pressure: { score: 1 }, brand_online: { choice: "none", probabilities: { none: 0.9 } }, has_link: { noul: 0.9 }, link_odd: { noul: 0.9 },
     };
     return new Response(JSON.stringify({ answers }), { status: 200 });

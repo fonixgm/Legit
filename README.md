@@ -33,6 +33,30 @@ Sin Clef no hay veredicto: es quien dice qué marca se está suplantando, y sin 
 
 ## Medición
 
+### v3 — 15 nov 2026 · 50 mensajes nunca vistos · la cifra limpia
+
+Resultado: [`eval/RESULTS-v3.md`](eval/RESULTS-v3.md). Conjunto: [`eval/cases-v3.jsonl`](eval/cases-v3.jsonl): las 25 estafas de INCIBE que no estaban en ninguna medición anterior y 25 SMS legítimos nuevos de la misma colección. Se subió a git (commit `4cae085`) **antes** de cambiar ninguna regla, y las reglas se ajustaron mirando solo la v1, la v2 y el conjunto de ajuste. Se midió una sola vez con el código de antes y otra con el de después.
+
+| | Estafas en rojo | Estafas en amarillo | **Estafas en verde** | Legítimos en verde | **Legítimos en rojo** |
+|---|---|---|---|---|---|
+| **Legit? con Clef (ahora)** | **25/25** | 0/25 | **0/25** | 23/25 | **0/25** |
+| Legit? con Clef (antes de los cambios) | 20/25 | 5/25 | 0/25 | 23/25 | 0/25 |
+| Sin Clef (palabras clave, reglas de ahora) | 18/25 | 7/25 | 0/25 | 25/25 | 0/25 |
+
+Qué cambió (todo medido antes en desarrollo, ver abajo):
+
+- Tres preguntas nuevas a Clef: **¿te manda a un enlace o web para hacerlo** (aunque la dirección falte o esté escrita con palabras), en vez de a la app oficial? ¿**dice tener un número nuevo o temporal**? ¿**solo trae un código** de verificación?
+- Regla nueva: un banco, una mensajería, un organismo o un aviso de cuenta que te manda a un enlace para pagar, verificar o actualizar, cuando el código no ve ningún enlace suyo, es rojo si pide algo con prisa y amarillo si no. Los avisos reales que mandan a un enlace llevan el enlace oficial, que el código reconoce; los que mandan a la app no cuentan.
+- Datos: la DGT usa también `dgt.gob.es` (su sede electrónica); la descripción de Openbank hacía que Clef confundiera Santander con Openbank.
+
+**Lee esto antes de citar la v3:**
+
+- Las 25 estafas son SMS de INCIBE con el enlace sustituido por «[URL fraudulenta]», y casi todas son bancarias. La regla nueva encaja muy bien con ellas, y por eso la versión sin Clef también sube (de 8 a 18 en rojo). En la vida real el enlace estaría y lo comprobaría el código.
+- Los legítimos siguen siendo SMS informales en inglés. Los dos en amarillo («change the number», «get out here quick») ya salían así antes.
+- n = 50. Es una indicación, no una tasa de error.
+
+**En desarrollo** (v1, v2 y ajuste, ya vistos, solo para ajustar): v1 pasa de 8 a 18 estafas en rojo y de 7 a 6 en verde; v2 de 19 a 27 en rojo y de 1 a 0 en verde; 0 legítimos en rojo en todos. Los 12 legítimos difíciles en español añadidos al conjunto de ajuste (avisos reales de banco que mandan a la app, códigos, la cita de la DGT…) no dan ningún rojo. Las tres estafas que siguen en amarillo en la v2 son «hola mamá, número nuevo»: amarillas a propósito, porque un hijo de verdad también cambia de número.
+
 ### v2 — 14 nov 2026 · 60 mensajes nuevos · tras arreglar la regla de «hijo en apuros»
 
 Resultado: [`eval/RESULTS-v2.md`](eval/RESULTS-v2.md). Conjunto: [`eval/cases-v2.jsonl`](eval/cases-v2.jsonl), fijado en git (commit `b5d8b58`) antes de medir y **sin ningún mensaje de la v1**. La regla se cambió mirando los fallos de la v1; por eso se mide con mensajes que nunca se vieron.
