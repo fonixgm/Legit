@@ -28,19 +28,40 @@ Sin Clef no hay veredicto: es quien dice qué marca se está suplantando, y sin 
 
 ## Medición
 
-**Todavía no hay cifra.** La medición se hace con 30 estafas reales (anonimizadas y con los enlaces neutralizados) y 30 mensajes legítimos en `eval/cases.jsonl`. Cómo recogerlos: [`eval/README.md`](eval/README.md).
+### v1 — 14 nov 2026 · 60 mensajes · una sola pasada
+
+Resultado completo, caso por caso: [`eval/RESULTS.md`](eval/RESULTS.md). Conjunto: [`eval/cases.jsonl`](eval/cases.jsonl), fijado y guardado en git (commit `357988e`) **antes** de medir, con una regla escrita en su cabecera.
+
+| | Estafas en rojo | Estafas en amarillo | **Estafas en verde (el error caro)** | Legítimos en verde | Legítimos en rojo |
+|---|---|---|---|---|---|
+| **Legit? con Clef** | 8/30 | 13/30 | **9/30** | 30/30 | 0/30 |
+| Sin Clef (palabras clave) | 3/30 | 8/30 | 19/30 | 26/30 | 0/30 |
+
+Mediana de latencia con Clef: 522 ms por mensaje.
+
+**Qué dice:** con Clef, las estafas que pasan como «nada raro» bajan de 19 a 9 y ninguna conversación legítima sale en rojo ni en amarillo. Clef es la pieza que más aporta. **Pero 9 de 30 estafas reales salen en verde**, y eso es lo que hay que arreglar.
+
+**Por qué fallan esas 9** (señales de Clef en [`eval/RESULTS.md`](eval/RESULTS.md)):
+
+- **2 son «hijo en apuros»** (`ar-hijo-01`, `ar-hijo-02`). Clef las reconoce (patrón «familiar en apuros» 0,95 y 0,91; «te pide contactar» 0,95), pero es el primer mensaje del timo: todavía no pide dinero, y la regla solo pone rojo si pide algo. Es un fallo de las reglas, no de Clef, y el caso más importante para personas mayores.
+- **4 eran mensajes con enlace al que la fuente le quitó el enlace** (terminan en «actualice:», «en la web:» o «XXXXXXXX»). Sin enlace no hay nada que comprobar; en la vida real el enlace estaría y entraría la comprobación de enlaces. No está medido.
+- **3 son solo el asunto de un correo** (Netflix, FedEx, Amazon), sin el cuerpo.
+
+**Limitaciones de este conjunto (léelas antes de citar la cifra):**
+
+- Los 30 legítimos son SMS informales **en inglés** (UCI SMS Spam Collection) y las estafas están **en español**. El 0/30 de falsos avisos dice poco del caso difícil: avisos reales de banco, Correos o códigos de verificación en español. En pruebas sueltas, un código de verificación de Google sí sale en amarillo.
+- INCIBE sustituye los enlaces de las estafas, así que **la comprobación de enlaces no se mide aquí**.
+- n = 60. Es una indicación, no una tasa de error fiable.
+- Los fallos se analizaron después de medir. Cualquier cambio de reglas a partir de ellos debe medirse con un conjunto **nuevo** (v2), no con este.
+
+### Cómo se mide
 
 ```bash
 npm run eval:check          # valida el conjunto: 30 + 30, sin enlaces vivos ni datos personales
-NAN_KEY=... npm run eval    # mide
+NAN_KEY=... npm run eval    # baseline (sin Clef) y Clef sobre los mismos mensajes -> eval/RESULTS.md
 ```
 
-Sobre los mismos mensajes corren dos brazos, con el mismo chequeo de enlaces y las mismas reglas:
-
-- **baseline**: adivinanzas por palabras clave (`lib/mock.js`) en lugar de Clef.
-- **clef**: Clef de verdad.
-
-`eval/RESULTS.md` pone los dos lado a lado con aciertos, falsos avisos y los casos en los que falla. La diferencia entre los dos brazos es lo que aporta Clef; si es pequeña, hay que decirlo. Sin `NAN_KEY` solo corre el baseline y el informe lo avisa. Los umbrales de [`lib/verdict.js`](lib/verdict.js) se ajustan con un conjunto aparte, no con el de prueba. `eval/cases.sample.jsonl` son ejemplos inventados para probar el script, no cuentan.
+Cómo se recogen los casos: [`eval/README.md`](eval/README.md). `eval/tuning.jsonl` (12 mensajes escritos a mano) sirve para ajustar; `eval/cases.sample.jsonl` solo para probar el script. Ninguno cuenta para la cifra.
 
 ## Lo que no hace
 
