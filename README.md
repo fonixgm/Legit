@@ -2,6 +2,10 @@
 
 # Legit?
 
+[![Legit? en 30 segundos: pegas el mensaje, Clef lo lee y en medio segundo te dice si es una estafa](docs/legit.gif)](docs/legit-30s.mp4)
+
+<sub>30 s sin sonido. Con música: [docs/legit-30s.mp4](docs/legit-30s.mp4). Las respuestas de Clef que salen son las reales para ese mensaje (14 nov 2026).</sub>
+
 Pegas el mensaje que te ha llegado (SMS, WhatsApp o correo) y en un segundo te dice si es una estafa, qué marca imita y qué hacer. Sin instalar nada, desde el móvil, en español y en inglés.
 
 > «Parece Amazon, pero el enlace no es de Amazon. No pulses.»
