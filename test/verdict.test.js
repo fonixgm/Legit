@@ -57,7 +57,7 @@ test("relative in trouble asking for money, no link = red", () => {
 });
 
 test("unknown link with nothing else = yellow", () => {
-  assert.equal(run(clef(), "mira esto https://recetas-de-la-abuela.example.org/tarta").verdict, "yellow");
+  assert.equal(run(clef(), "mira esto https://recetas-de-la-abuela-pepa.es/tarta").verdict, "yellow");
 });
 
 test("brand + shortener + request = red", () => {
@@ -165,4 +165,22 @@ test("brand + request + a link that forwards elsewhere = red, like a shortener",
   assert.equal(r.headline.code, "brand_redirect");
   // Without a brand claim it is only a warning.
   assert.equal(run(clef(), "https://www.google.com/url?q=https://example.com").verdict, "yellow");
+});
+
+test("a link to a widely visited site is not a warning by itself", () => {
+  const r = run(clef({ brand: { id: "other", p: 0.8 } }), "Tu factura de este mes ya está disponible: https://clientes.endesa.com/factura");
+  assert.equal(r.verdict, "green");
+  assert.equal(r.headline.code, "known_site");
+});
+
+test("...but it does not excuse a request for data, nor a page on an open platform", () => {
+  assert.equal(run(clef({ asks: 0.9, brand: { id: "other", p: 0.8 } }), "Confirma tu tarjeta en https://clientes.endesa.com/x").verdict, "yellow");
+  assert.equal(run(clef(), "Mira: https://premios-2026.weebly.com").verdict, "yellow");
+  assert.equal(run(clef(), "Mira: https://loquesea.blogspot.com/p").verdict, "yellow");
+});
+
+test("a known brand linking to an unrelated popular site is still a mismatch", () => {
+  const r = run(clef({ asks: 0.9, brand: { id: "bbva", p: 0.9 }, pressure: 2.5 }), "BBVA: verifique su cuenta en https://www.renfe.com/login");
+  assert.equal(r.verdict, "red");
+  assert.equal(r.headline.code, "brand_link_mismatch");
 });
