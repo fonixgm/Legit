@@ -20,6 +20,7 @@ Pensado para una persona mayor: un color (rojo, amarillo o verde: el verde es «
    |---|---|---|
    | ¿Pide datos, códigos o dinero? | `noul` | probabilidad de «sí» |
    | ¿Te manda llamar o escribir a un contacto que da? | `noul` | probabilidad de «sí» (estafas de «llama a este número», sin enlace) |
+   | ¿Te invita a apostar o promete dinero fácil? | `noul` | probabilidad de «sí» (casino, giros gratis, inversiones milagro: con enlace a una web desconocida, rojo aunque no pida datos) |
    | ¿De qué marca dice ser? | `choice` ×4 | 50 marcas: 30 globales y 20 de España y Latinoamérica, más «otra» y «ninguna» (una pregunta por grupo: Clef admite 26 opciones por pregunta). Cada dominio nuevo está verificado en Wikidata y/o en la web de la marca: ver [`lib/brands.js`](lib/brands.js) |
    | ¿Qué patrón de estafa sigue? | `choice` | banco, paquete, cuenta, premio, familiar en apuros, soporte técnico, inversión, ninguno |
    | ¿Cuánta presión mete? | `score` | de «ninguna» a «extrema» |
@@ -48,6 +49,14 @@ Mediana de latencia con Clef: 521 ms por mensaje.
 - **El legítimo en amarillo** (`uci2-07`) pregunta qué datos de cuenta hacen falta para una transferencia: el aviso es razonable.
 - **Composición:** 21 de las 30 estafas son SMS bancarios de INCIBE (más fáciles: nombran el banco y piden verificar). La v2 no es más difícil que la v1, es distinta; no se puede leer «de 9 a 1» como mejora pura de la regla.
 - Mismas limitaciones que la v1: legítimos informales en inglés y estafas sin enlace.
+
+### Repetida el 15 nov con la versión final
+
+Las dos mediciones se repitieron contra la web desplegada ([`eval/RESULTS-v2.md`](eval/RESULTS-v2.md), [`eval/RESULTS.md`](eval/RESULTS.md)):
+
+- **v2: idéntica.** 19/30 estafas en rojo, 1/30 en verde, 29/30 legítimos en verde, 0/30 en rojo.
+- **v1: de 9 a 7 estafas en verde**, por la regla del «hijo en apuros». No es una mejora limpia: esa regla se escribió mirando los fallos de la v1.
+- Lo añadido después (webs conocidas, capturas, apuestas y dinero fácil) solo actúa sobre mensajes con enlace, y ningún legítimo de estos conjuntos lleva enlace, así que no cambia estas cifras.
 
 ### v1 — 14 nov 2026 · 60 mensajes · una sola pasada
 

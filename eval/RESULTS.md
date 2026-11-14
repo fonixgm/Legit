@@ -7,12 +7,12 @@ Set: `eval/cases.jsonl` · 60 messages (30 scams, 30 legitimate) · date 2026-11
 | Arm | Scams caught (red) | Scams missed (green) | Legit cleared (green) | False alarms (legit red) | Errors |
 |---|---|---|---|---|---|
 | baseline (no Clef) | 3/30 (10%) | 19/30 (63%) | 26/30 (87%) | 0/30 (0%) | 0 |
-| clef | 8/30 (27%) | 9/30 (30%) | 30/30 (100%) | 0/30 (0%) | 0 |
+| clef | 8/30 (27%) | 7/30 (23%) | 30/30 (100%) | 0/30 (0%) | 0 |
 
 
 `baseline` = same link check and same rules, but keyword guesses (`lib/mock.js`) instead of Clef. What `clef` gains over it is what the model adds.
 
-Median latency with Clef: 522 ms per message.
+Median latency with Clef: 736 ms per message.
 
 ## baseline
 
@@ -47,7 +47,7 @@ Median latency with Clef: 522 ms per message.
 
 | | Red | Yellow | Green | Error |
 |---|---|---|---|---|
-| **Scams** (30) | 8 | 13 | 9 | 0 |
+| **Scams** (30) | 8 | 15 | 7 | 0 |
 | **Legitimate** (30) | 0 | 0 | 30 | 0 |
 
 ### Where it fails
@@ -55,8 +55,6 @@ Median latency with Clef: 522 ms per message.
 - `ar-correos-02` (scam) → green · clean
 - `ar-correos-03` (scam) → green · clean
 - `ar-aeat-01` (scam) → green · clean
-- `ar-hijo-01` (scam) → green · clean
-- `ar-hijo-02` (scam) → green · clean
 - `ar-netflix-04` (scam) → green · clean
 - `ar-iberdrola-01` (scam) → green · clean
 - `ar-fedex-01` (scam) → green · clean
@@ -75,8 +73,8 @@ Median latency with Clef: 522 ms per message.
 | ar-seur-01 | scam | green | yellow |
 | ar-tgss-01 | scam | green | red |
 | ar-aeat-01 | scam | yellow | green |
-| ar-hijo-01 | scam | green | green |
-| ar-hijo-02 | scam | green | green |
+| ar-hijo-01 | scam | green | yellow |
+| ar-hijo-02 | scam | green | yellow |
 | ar-netflix-01 | scam | yellow | yellow |
 | ar-netflix-02 | scam | green | yellow |
 | ar-netflix-03 | scam | green | yellow |

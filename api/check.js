@@ -21,9 +21,7 @@ export default async function handler(req, res) {
   if (!text) return res.status(400).json({ error: "empty" });
   if (text.length > MAX_CHARS) return res.status(413).json({ error: "too_long", max: MAX_CHARS });
 
-  const source = req.body?.source === "screenshot" ? "screenshot" : "text";
-  const cacheKey = `${source}\n${text}`;
-  const cached = cache.get(cacheKey);
+  const cached = cache.get(text);
   if (cached) return res.status(200).json({ ...cached, cached: true });
 
   const turn = allow(clientIp(req));
@@ -33,8 +31,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const result = await checkMessage(text, { source });
-    cache.set(cacheKey, result);
+    const result = await checkMessage(text);
+    cache.set(text, result);
     return res.status(200).json(result);
   } catch (err) {
     const status = err instanceof ClefError ? err.status : 0;

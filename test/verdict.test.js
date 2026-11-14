@@ -8,6 +8,7 @@ import { buildQuestions, readAnswers, ClefError, BRAND_QUESTIONS } from "../lib/
 const clef = (o = {}) => ({
   asks: 0.05,
   calls: 0.05,
+  lure: 0.05,
   brand: { id: "none", p: 0.9 },
   type: { id: "none", p: 0.9 },
   pressure: 0.2,
@@ -71,13 +72,14 @@ test("readAnswers parses the documented Clef response shape", () => {
     answers: {
       asks: { type: "noul", noul: 0.94 },
       calls: { type: "noul", noul: 0.2 },
+      lure: { type: "noul", noul: 0.1 },
       brand_online: { type: "choice", choice: "amazon", probabilities: { amazon: 0.93, none: 0.07 }, confidence: 0.9 },
       brand_money: { type: "choice", choice: "other", probabilities: { other: 0.6, none: 0.4 }, confidence: 0.5 },
       scam_type: { type: "choice", choice: "account", probabilities: { account: 0.7 }, confidence: 0.6 },
       pressure: { type: "score", score: 2.6, confidence: 0.7 },
     },
   });
-  assert.deepEqual(a, { asks: 0.94, calls: 0.2, brand: { id: "amazon", p: 0.93 }, type: { id: "account", p: 0.7 }, pressure: 2.6, pressureConfidence: 0.7 });
+  assert.deepEqual(a, { asks: 0.94, calls: 0.2, lure: 0.1, brand: { id: "amazon", p: 0.93 }, type: { id: "account", p: 0.7 }, pressure: 2.6, pressureConfidence: 0.7 });
   const q = buildQuestions();
   for (const k of [...BRAND_QUESTIONS, "scam_type"]) assert.ok(Object.keys(q[k].criteria).length <= 26, k);
 });
@@ -92,9 +94,9 @@ test("result says whether every link is the claimed brand's (the web's third que
 
 test("a missing or malformed Clef answer is an error, never a green verdict", () => {
   const ok = {
-    asks: { noul: 0.1 }, calls: { noul: 0.1 }, scam_type: { choice: "none" }, pressure: { score: 0 }, brand_online: { choice: "none" }, brand_money: { choice: "none" },
+    asks: { noul: 0.1 }, calls: { noul: 0.1 }, lure: { noul: 0.1 }, scam_type: { choice: "none" }, pressure: { score: 0 }, brand_online: { choice: "none" }, brand_money: { choice: "none" },
   };
-  for (const bad of [{}, null, undefined, { answers: {} }, { answers: { ...ok, asks: undefined } }, { answers: { ...ok, calls: undefined } }, { answers: { ...ok, pressure: { score: "high" } } }, { answers: { ...ok, scam_type: {} } }]) {
+  for (const bad of [{}, null, undefined, { answers: {} }, { answers: { ...ok, asks: undefined } }, { answers: { ...ok, calls: undefined } }, { answers: { ...ok, lure: undefined } }, { answers: { ...ok, pressure: { score: "high" } } }, { answers: { ...ok, scam_type: {} } }]) {
     assert.throws(() => readAnswers(bad), ClefError);
   }
   assert.doesNotThrow(() => readAnswers({ answers: ok }));
@@ -183,4 +185,17 @@ test("a known brand linking to an unrelated popular site is still a mismatch", (
   const r = run(clef({ asks: 0.9, brand: { id: "bbva", p: 0.9 }, pressure: 2.5 }), "BBVA: verifique su cuenta en https://www.renfe.com/login");
   assert.equal(r.verdict, "red");
   assert.equal(r.headline.code, "brand_link_mismatch");
+});
+
+test("gambling or easy-money lure + unknown site = red, even if it asks for nothing", () => {
+  const casino = clef({ lure: 0.92, type: { id: "prize", p: 0.71 } });
+  const r = run(casino, "Te regalamos 50 giros gratis y un bono de 200€. Juega ya en casino-suerte.club/bono");
+  assert.equal(r.verdict, "red");
+  assert.equal(r.headline.code, "lure_link");
+  assert.equal(run(casino, "Juega ya: bit.ly/3abc").verdict, "red");
+  // A licensed, widely visited bookmaker is not an unknown site; without a link there is no site.
+  assert.notEqual(run(casino, "Bono de bienvenida en https://www.bet365.es").verdict, "red");
+  assert.notEqual(run(casino, "Te regalamos 50 giros gratis").verdict, "red");
+  // A raffle from the local club is not a lure.
+  assert.notEqual(run(clef({ lure: 0.2, type: { id: "prize", p: 0.9 } }), "Has ganado la cesta del sorteo. Info: cdsanblas.es").verdict, "red");
 });
