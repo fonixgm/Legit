@@ -1,4 +1,5 @@
 import { test } from "node:test";
+import { decide } from "../lib/verdict.js";
 import assert from "node:assert/strict";
 import { extractLinks, refang, verifyByRedirect } from "../lib/links.js";
 
@@ -94,3 +95,35 @@ test("plain text is not mistaken for links", () => {
 function pick({ domain, kind, brand }) {
   return { domain, kind, brand };
 }
+
+test("homograph domains in Cyrillic, Greek or Armenian are caught and name the brand they imitate", () => {
+  const cases = [
+    ["https://pаypal.com/login", "paypal"], // one Cyrillic а
+    ["https://аррӏе.com/id", "apple"], // аррӏе: all Cyrillic, no mixing
+    ["https://xn--80ak6aa92e.com/", "apple"], // the same, written in punycode
+    ["https://gοοgle.com", "google"], // Greek ο
+    ["https://саіхаbank.com", "caixabank"], // саіха + Latin bank
+    ["https://nеtflix-аccount.com", "netflix"],
+  ];
+  for (const [url, brand] of cases) {
+    const [l] = extractLinks(url);
+    assert.equal(l.kind, "homoglyph", url);
+    assert.equal(l.brand, brand, url);
+  }
+});
+
+test("real non-Latin domains are not homographs", () => {
+  for (const url of ["https://пример.рф", "https://яндекс.рф/путь", "https://ελληνικά.gr"]) {
+    const [l] = extractLinks(url);
+    assert.notEqual(l?.kind, "homoglyph", url);
+  }
+});
+
+test("a Cyrillic homograph of the claimed bank is red", () => {
+  const r = decide(
+    { asks: 0.9, calls: 0.05, brand: { id: "caixabank", p: 0.9 }, type: { id: "bank", p: 0.9 }, pressure: 2.5 },
+    extractLinks("CaixaBank: verifique su cuenta https://саіхаbank.com/acceso"),
+  );
+  assert.equal(r.verdict, "red");
+  assert.equal(r.headline.code, "homoglyph");
+});
