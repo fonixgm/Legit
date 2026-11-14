@@ -5,9 +5,9 @@
   "type": "module",
   "description": "Legit? — paste a suspicious message and find out if it is a scam. Clef decides.",
   "scripts": {
-    "dev": "node dev.mjs",
+    "dev": "node --env-file-if-exists=.env dev.mjs",
     "test": "node --test",
-    "eval": "node eval/run.mjs",
+    "eval": "node --env-file-if-exists=.env eval/run.mjs",
     "eval:check": "node eval/check-cases.mjs"
   },
   "engines": { "node": "22.x" },
