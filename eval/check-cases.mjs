@@ -6,7 +6,7 @@
 import { readFile } from "node:fs/promises";
 
 const file = process.argv[2] ?? "eval/cases.jsonl";
-const WANT = 30;
+const WANT = Number(process.argv[3]) || 30; // v3 has 25 + 25: every unused INCIBE scam there was
 const problems = [];
 const warn = (id, msg) => problems.push(`${id}: ${msg}`);
 
