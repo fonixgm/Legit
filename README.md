@@ -2,9 +2,9 @@
 
 # Legit?
 
-[![Legit? en 30 segundos: pegas el mensaje, Clef lo lee y en medio segundo te dice si es una estafa](docs/legit.gif)](docs/legit-30s.mp4)
+[![Legit? en 30 segundos: pegas un mensaje o una captura, Clef lo lee y en medio segundo te dice si es una estafa](docs/legit.gif)](docs/legit-30s.mp4)
 
-<sub>30 s sin sonido. Con música: [docs/legit-30s.mp4](docs/legit-30s.mp4). Las respuestas de Clef que salen son las reales para ese mensaje (14 nov 2026).</sub>
+<sub>32 s sin sonido. Con música: [docs/legit-30s.mp4](docs/legit-30s.mp4). Las respuestas de Clef que salen son las reales para ese mensaje con la versión actual (14 nov 2026): pide datos 3 %, dice tener un número nuevo 96 %, un familiar 61 %. «Medio segundo»: mediana de 512 ms en 10 pasadas.</sub>
 
 Pegas el mensaje que te ha llegado (SMS, WhatsApp o correo), o subes la captura, y en un segundo te dice si es una estafa, qué marca imita y qué hacer. Sin instalar nada, desde el móvil, en español y en inglés.
 
