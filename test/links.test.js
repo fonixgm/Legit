@@ -127,3 +127,23 @@ test("a Cyrillic homograph of the claimed bank is red", () => {
   assert.equal(r.verdict, "red");
   assert.equal(r.headline.code, "homoglyph");
 });
+
+test("legitimate sites that merely resemble a brand are not imitations", () => {
+  // found by running the detector over the 10,000 most visited domains
+  for (const d of ["cloud.com", "huaweicloud.com", "pcloud.com", "telegraph.co.uk", "overdrive.com", "amazonaws.com", "correios.com.br", "outlookindia.com"]) {
+    assert.equal(one(`https://${d}/`).kind, "unknown", d);
+  }
+  assert.equal(one("https://icloud-verify.com").brand, "apple");
+  assert.equal(one("https://telegran.org").kind, "lookalike"); // still caught: one slip, same first letter
+});
+
+test("an accent is not a disguise; look-alike letters from another alphabet are", () => {
+  assert.notEqual(one("https://españa.es/").kind, "homoglyph");
+  assert.notEqual(one("https://camión-ya.com/").kind, "homoglyph");
+  assert.equal(one("https://аррӏе.com/").kind, "homoglyph"); // all Cyrillic, reads "apple"
+});
+
+test("brand-owned endings are the brand's", () => {
+  assert.deepEqual(pick(one("https://blog.google/products")), { domain: "blog.google", kind: "official", brand: "google" });
+  assert.equal(one("https://cloud.microsoft/x").brand, "microsoft");
+});

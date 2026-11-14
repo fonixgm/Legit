@@ -71,6 +71,18 @@ Mediana de latencia con Clef: 522 ms por mensaje.
 - n = 60. Es una indicación, no una tasa de error fiable.
 - Los fallos se analizaron después de medir. Cualquier cambio de reglas a partir de ellos debe medirse con un conjunto **nuevo** (v2), no con este.
 
+### La comprobación de enlaces, medida aparte (14 nov 2026)
+
+Los dos conjuntos de arriba casi no tienen enlaces, así que el detector de imitaciones se mide con listas públicas, sin Clef ([`eval/links-check.mjs`](eval/links-check.mjs)):
+
+| Lista | Resultado |
+|---|---|
+| 10.000 dominios más visitados ([Tranco](https://tranco-list.eu)) | **0** marcados como imitación. Antes de esta medición eran más de 100 (`cloud.com`, `telegraph.co.uk`, `correios.com.br`, `amazonaws.com`…): se corrigieron las reglas y se añadió una lista revisada, [`lib/popular.js`](lib/popular.js) |
+| 100.000 más visitados | 170 marcados (0,17 %), sin revisar uno a uno: hay imitaciones reales y webs legítimas mezcladas |
+| 300 enlaces de phishing activos ([OpenPhish](https://openphish.com)) | **0** pasan por «enlace de la marca». 39 (13 %) se detectan como imitación solo por el enlace; los otros 261 son dominios sin relación con la marca, y ahí hace falta que Clef diga qué marca se suplanta |
+
+Qué dice: el enlace por sí solo caza pocas estafas (13 %), pero no da por buena ninguna; el resto del trabajo es de Clef. Qué no dice: nada sobre mensajes completos.
+
 ### Cómo se mide
 
 ```bash
@@ -85,7 +97,7 @@ Cómo se recogen los casos: [`eval/README.md`](eval/README.md). `eval/tuning.jso
 - No detecta llamadas ni voces clonadas.
 - No sustituye a tu banco.
 - No comprueba números de teléfono ni abre los enlaces.
-- No guarda los mensajes: se analizan en el servidor y se olvidan. No se escriben en los logs.
+- No guarda los mensajes: se analizan en el servidor y no se escriben en disco ni en los logs. El veredicto se recuerda unos minutos en memoria, bajo un hash del texto, para no repetir la consulta si varias personas comprueban el mismo mensaje.
 - Todavía no lee capturas de pantalla, solo texto.
 
 ## Ejecutarlo
