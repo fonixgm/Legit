@@ -79,9 +79,18 @@ Los dos conjuntos de arriba casi no tienen enlaces, así que el detector de imit
 |---|---|
 | 10.000 dominios más visitados ([Tranco](https://tranco-list.eu)) | **0** marcados como imitación. Antes de esta medición eran más de 100 (`cloud.com`, `telegraph.co.uk`, `correios.com.br`, `amazonaws.com`…): se corrigieron las reglas y se añadió una lista revisada, [`lib/popular.js`](lib/popular.js) |
 | 100.000 más visitados | 170 marcados (0,17 %), sin revisar uno a uno: hay imitaciones reales y webs legítimas mezcladas |
-| 300 enlaces de phishing activos ([OpenPhish](https://openphish.com)) | **0** pasan por «enlace de la marca». 39 (13 %) se detectan como imitación solo por el enlace; los otros 261 son dominios sin relación con la marca, y ahí hace falta que Clef diga qué marca se suplanta |
+| 45.387 enlaces de phishing activos y verificados ([PhishTank](https://phishtank.org), feed `online-valid` descargado el 14 nov 2026) | **3** pasan por «enlace de la marca» (una imagen de Bing, la portada de Bing y un perfil de TikTok). Antes de esta medición eran **402**: formularios de Microsoft, redirecciones de Google y Bing (`google.com/url?q=`, `/amp/`, `bing.com/ck`), Looker Studio, Google Cloud Storage, la API de bots de Telegram… Ahora esos dan amarillo («la página la puede crear cualquiera» o «el enlace te reenvía a otra web») |
 
-Qué dice: el enlace por sí solo caza pocas estafas (13 %), pero no da por buena ninguna; el resto del trabajo es de Clef. Qué no dice: nada sobre mensajes completos.
+Desglose de PhishTank tras el cambio: 5.350 (11,8 %) páginas de terceros dentro de una marca y 182 (0,4 %) redirecciones, que dan amarillo; 265 (0,6 %) imitaciones de marca; 2.303 (5,1 %) acortadores; 70 IP; **37.212 (82 %) dominios sin relación con ninguna marca**. En ese 82 % el enlace no dice nada por sí solo: hace falta que Clef diga qué marca dice ser el mensaje y qué pide.
+
+Qué dice: el enlace por sí solo caza pocas estafas, pero casi no da por buena ninguna; el resto del trabajo es de Clef. Qué no dice: nada sobre mensajes completos. **Ojo:** las reglas de redirecciones salen de mirar este mismo feed. Para validarlas, se mide otra vez solo con enlaces enviados después del último de esta descarga (`2026-11-13T23:19:17`):
+
+```bash
+curl -sLo online-valid.csv http://data.phishtank.com/data/online-valid.csv
+node eval/links-check.mjs phishing online-valid.csv 2026-11-13T23:19:17
+```
+
+No se usa OpenPhish: las condiciones de su feed gratuito no permiten usarlo para desarrollar productos.
 
 ### Cómo se mide
 

@@ -147,3 +147,52 @@ test("brand-owned endings are the brand's", () => {
   assert.deepEqual(pick(one("https://blog.google/products")), { domain: "blog.google", kind: "official", brand: "google" });
   assert.equal(one("https://cloud.microsoft/x").brand, "microsoft");
 });
+
+// Shapes seen in PhishTank's online-valid feed (14 nov 2026): official domains that forward
+// to, or host, a page anyone can make. Paths and ids shortened.
+test("a brand's link that forwards somewhere else, or hosts anyone's page, is not the brand's", () => {
+  const notOwn = [
+    "https://www.google.com/url?q=https%3A%2F%2Fdoc-b5d9.example.workers.dev%2F",
+    "https://maps.google.lt/url?q=https://phish.b-cdn.net/&sa=D",
+    "https://google.com/amp/s/evil.home.pl/root",
+    "https://accounts.google.com/ServiceLogin?continue=https://sites.google.com/view/viewbill/",
+    "https://apis.google.com/additnow/l?__lu=https://login.evil.app/x",
+    "https://www.bing.com/ck/a?!&&p=5107c25ec3f8&u=a1aHR0cHM6Ly9ldmlsLmNvbQ",
+    "https://www.linkedin.com/slink?code=gp7c4vtH",
+    "https://lnkd.in/abc123",
+    "https://goo.gl/xyz",
+    "https://www.google.com/share.google?q=Vn82LL",
+    "https://share.google/abc",
+    "https://forms.office.com/r/swCmvRzME7",
+    "https://forms.microsoft.com/r/abc",
+    "https://lookerstudio.google.com/reporting/498c2a78/page/p_4gb3",
+    "https://storage.cloud.google.com/bucket/index.html",
+    "https://storage.googleapis.com/bucket/index.html",
+    "https://teams.live.com/l/invite/FAAVXX",
+    "https://www.messenger.com/t/61552983840671",
+  ];
+  for (const url of notOwn) {
+    const l = one(url);
+    // Either not on the brand's list at all, or flagged: never a clean official link.
+    assert.ok(l.kind !== "official" || l.userContent || l.redirect, `${url} -> ${JSON.stringify(l)}`);
+  }
+  // The brand's own pages stay its own, even with a query string pointing back to itself.
+  for (const url of ["https://www.google.com/search?q=tiempo", "https://accounts.google.com/ServiceLogin?continue=https://mail.google.com/mail/", "https://www.linkedin.com/in/someone", "https://www.microsoft.com/es-es/microsoft-365"]) {
+    const l = one(url);
+    assert.ok(!l.userContent && !l.redirect, `${url} -> ${JSON.stringify(l)}`);
+  }
+});
+
+test("a brand link that forwards elsewhere never clears a message", () => {
+  const clef = { asks: 0.9, calls: 0.1, brand: { id: "google", p: 0.95 }, type: { id: "account", p: 0.9 }, pressure: 0.2 };
+  const r = decide(clef, extractLinks("Revisa tu cuenta: https://www.google.com/url?q=https://evil.example.com/login"));
+  assert.notEqual(r.verdict, "green");
+  assert.ok(r.reasons.some((x) => x.code === "redirect_link"), JSON.stringify(r.reasons));
+});
+
+test("more PhishTank shapes: prefixed sites.google, bare /amp/, Sway, Telegram bot API", () => {
+  for (const url of ["https://456.sites.google.com/view/x", "http://www.sites.google.com/view/x/", "https://www.google.nl/amp/evil.example.com/lt/1", "https://google.com//amp/a/evil.example.com/", "https://maps.app.goo.gl/MSruFqh9", "https://meet.google.com/linkredirect?dest=https://evil.example.com", "https://forms.cloud.microsoft/r/Yss", "https://sway.cloud.microsoft/6c9u?ref=email", "https://api.telegram.org/bot1:AA/getChat"]) {
+    const l = one(url);
+    assert.ok(l.kind !== "official" || l.userContent || l.redirect, `${url} -> ${JSON.stringify(l)}`);
+  }
+});
