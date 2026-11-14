@@ -99,7 +99,9 @@ ${Object.entries(S).map(([k, s]) => `## ${k}\n\n${table(s)}\n\n### Where it fail
 ${cases.map((c) => `| ${c.id} | ${c.label} | ${Object.keys(arms).map((a) => verdictOf(a, c.id)).join(" | ")} |`).join("\n")}
 `;
 
-const out = mock ? "eval/RESULTS.mock.md" : hasClef ? "eval/RESULTS.md" : "eval/RESULTS.baseline.md";
+// cases.jsonl -> RESULTS.md, cases-v2.jsonl -> RESULTS-v2.md: one report per set, never overwritten by another set.
+const tag = (file.match(/cases(-[\w]+)?\.jsonl$/)?.[1]) ?? (file.endsWith("cases.jsonl") ? "" : "-" + file.replace(/^.*\//, "").replace(/\.jsonl$/, ""));
+const out = mock ? `eval/RESULTS${tag}.mock.md` : hasClef ? `eval/RESULTS${tag}.md` : `eval/RESULTS${tag}.baseline.md`;
 await writeFile(out, md);
 console.log(md.split("## Every case")[0]);
 console.log(`Written to ${out}`);

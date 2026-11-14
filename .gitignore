@@ -3,6 +3,7 @@ node_modules/
 .env.local
 .vercel/
 eval/results.json
-eval/RESULTS.mock.md
-eval/RESULTS.baseline.md
-eval/RESULTS.mock.md
+eval/RESULTS*.mock.md
+eval/RESULTS*.baseline.md
+eval/RESULTS-tuning.md
+eval/RESULTS-cases.sample.md
