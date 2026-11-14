@@ -1,4 +1,4 @@
-// TUNING SET: written by hand by Claude, NOT real messages. Use it to tune thresholds and wording.
+// TUNING SET: written by hand, NOT real messages. Use it to tune thresholds and wording.
 // Never publish a figure from it: the published one comes from eval/cases.jsonl (30 real + 30 real).
 {"id": "t01", "label": "scam", "text": "Hola mamá, se me ha roto el móvil, este es mi número nuevo. Necesito que me hagas un Bizum de 480 euros hoy, luego te explico.", "source": "synthetic-tuning: familia sin enlace"}
 {"id": "t02", "label": "scam", "text": "BBVA: cargo de 899 EUR en AMAZON. Si no lo reconoces llama ya al 912 345 678 para anularlo.", "source": "synthetic-tuning: llamada de vuelta"}
