@@ -6,7 +6,7 @@
 
 <sub>30 s sin sonido. Con música: [docs/legit-30s.mp4](docs/legit-30s.mp4). Las respuestas de Clef que salen son las reales para ese mensaje (14 nov 2026).</sub>
 
-Pegas el mensaje que te ha llegado (SMS, WhatsApp o correo) y en un segundo te dice si es una estafa, qué marca imita y qué hacer. Sin instalar nada, desde el móvil, en español y en inglés.
+Pegas el mensaje que te ha llegado (SMS, WhatsApp o correo), o subes la captura, y en un segundo te dice si es una estafa, qué marca imita y qué hacer. Sin instalar nada, desde el móvil, en español y en inglés.
 
 > «Parece Amazon, pero el enlace no es de Amazon. No pulses.»
 
@@ -24,7 +24,7 @@ Pensado para una persona mayor: un color (rojo, amarillo o verde: el verde es «
    | ¿Qué patrón de estafa sigue? | `choice` | banco, paquete, cuenta, premio, familiar en apuros, soporte técnico, inversión, ninguno |
    | ¿Cuánta presión mete? | `score` | de «ninguna» a «extrema» |
 
-2. **El código comprueba lo que Clef no puede saber** ([`lib/links.js`](lib/links.js)): saca los enlaces y mira el dominio real con [`tldts`](https://www.npmjs.com/package/tldts) (`amazon.com.seguridad.xyz` es de `seguridad.xyz`), si es de verdad de esa marca ([`lib/brands.js`](lib/brands.js)), si la imita (`paypa1.com`, `bbva-clientes.com`, o mal escrita como `mcirosfot.com`), si mezcla letras de otro alfabeto, si es un acortador o una IP. Si el dominio es el nombre exacto de la marca con una terminación que no está en la lista (`netflix.co`), mira si su portada redirige al dominio oficial; si no, avisa en amarillo sin acusar.
+2. **El código comprueba lo que Clef no puede saber** ([`lib/links.js`](lib/links.js)): saca los enlaces y mira el dominio real con [`tldts`](https://www.npmjs.com/package/tldts) (`amazon.com.seguridad.xyz` es de `seguridad.xyz`), si es de verdad de esa marca ([`lib/brands.js`](lib/brands.js)), si la imita (`paypa1.com`, `bbva-clientes.com`, o mal escrita como `mcirosfot.com`), si mezcla letras de otro alfabeto, si es un acortador o una IP. Si el dominio es el nombre exacto de la marca con una terminación que no está en la lista (`netflix.co`), mira si su portada redirige al dominio oficial; si no, avisa en amarillo sin acusar. Si el mensaje no dice ser ninguna marca conocida y no pide nada, un enlace a una web muy visitada (los 100.000 dominios de [Tranco](https://tranco-list.eu), sin las plataformas donde cualquiera publica: Weebly, Blogspot, Dropbox…) no avisa por sí solo.
 
 3. **El veredicto sale de reglas** sobre esas respuestas, no de texto generado ([`lib/verdict.js`](lib/verdict.js)). Ejemplo: dice ser una marca, el enlace no es de esa marca y pide datos → rojo. Cada motivo es un código que la web traduce, y la web enseña las probabilidades de Clef en «Por qué».
 
@@ -111,7 +111,7 @@ Cómo se recogen los casos: [`eval/README.md`](eval/README.md). `eval/tuning.jso
 - No sustituye a tu banco.
 - No comprueba números de teléfono ni abre los enlaces.
 - No guarda los mensajes: se analizan en el servidor y no se escriben en disco ni en los logs. El veredicto se recuerda unos minutos en memoria, bajo un hash del texto, para no repetir la consulta si varias personas comprueban el mismo mensaje.
-- Todavía no lee capturas de pantalla, solo texto.
+- Las capturas se leen en el propio navegador (OCR con Tesseract.js) y la imagen no se envía a ningún sitio; lo que se comprueba es el texto leído, que queda a la vista para corregirlo. Un enlace mal leído puede dar un aviso equivocado. Clef no ve la imagen.
 
 ## Ejecutarlo
 
