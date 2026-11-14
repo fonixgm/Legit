@@ -52,13 +52,13 @@ Rojo: el enlace empieza por google.com, pero te reenvía a otra web.
 
 > «Lo medimos con mensajes reales que nadie había visto: estafas citadas por INCIBE y Maldita, y SMS legítimos. El último conjunto lo guardamos en git antes de tocar las reglas.»
 
-| Último conjunto (v3, 25 estafas + 25 legítimos) | Antes | Ahora |
+| Último conjunto (v3, 25 estafas + 25 legítimos) | Sin Clef | Con Clef |
 |---|---|---|
-| Estafas detectadas en rojo | 20 | **25** |
-| Estafas que pasan en verde | 0 | **0** |
+| Estafas detectadas en rojo | 8 | **25** |
+| Estafas que pasan en verde | 4 | **0** |
 | Mensajes legítimos en rojo | 0 | **0** |
 
-> «Y en el conjunto anterior, sin Clef se escapaban 8 de 30 estafas en verde; con Clef, ninguna.»
+> «Sin Clef, la app no sirve: Clef toma la decisión.»
 
 Si preguntan: las estafas de INCIBE vienen sin el enlace (lo quita la fuente), y los legítimos son SMS informales en inglés. Está todo en el README.
 

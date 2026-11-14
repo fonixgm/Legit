@@ -6,33 +6,41 @@ Set: `eval/cases.jsonl` · 60 messages (30 scams, 30 legitimate) · date 2026-11
 
 | Arm | Scams caught (red) | Scams missed (green) | Legit cleared (green) | False alarms (legit red) | Errors |
 |---|---|---|---|---|---|
-| baseline (no Clef) | 5/30 (17%) | 11/30 (37%) | 26/30 (87%) | 0/30 (0%) | 0 |
+| baseline (no Clef) | 3/30 (10%) | 19/30 (63%) | 26/30 (87%) | 0/30 (0%) | 0 |
 | clef | 18/30 (60%) | 6/30 (20%) | 30/30 (100%) | 0/30 (0%) | 0 |
 
 
 `baseline` = same link check and same rules, but keyword guesses (`lib/mock.js`) instead of Clef. What `clef` gains over it is what the model adds.
 
-Median latency with Clef: 652 ms per message.
+Median latency with Clef: 624 ms per message.
 
 ## baseline
 
 | | Red | Yellow | Green | Error |
 |---|---|---|---|---|
-| **Scams** (30) | 5 | 14 | 11 | 0 |
+| **Scams** (30) | 3 | 8 | 19 | 0 |
 | **Legitimate** (30) | 0 | 4 | 26 | 0 |
 
 ### Where it fails
 
 - `ar-correos-03` (scam) → green · clean
+- `ar-correos-04` (scam) → green · clean
+- `ar-dhl-01` (scam) → green · clean
+- `ar-mrw-01` (scam) → green · clean
+- `ar-seur-01` (scam) → green · clean
 - `ar-tgss-01` (scam) → green · clean
+- `ar-hijo-01` (scam) → green · clean
 - `ar-hijo-02` (scam) → green · clean
 - `ar-netflix-02` (scam) → green · clean
 - `ar-netflix-03` (scam) → green · clean
 - `ar-netflix-04` (scam) → green · clean
 - `ar-iberdrola-01` (scam) → green · clean
+- `ar-movistar-01` (scam) → green · clean
 - `ar-fedex-01` (scam) → green · clean
 - `ar-fedex-02` (scam) → green · clean
 - `ar-amazon-01` (scam) → green · clean
+- `inc-bank-22` (scam) → green · clean
+- `inc-bank-39` (scam) → green · clean
 - `inc-bank-40` (scam) → green · clean
 
 ## clef
@@ -58,31 +66,31 @@ Median latency with Clef: 652 ms per message.
 | ar-correos-01 | scam | yellow | red |
 | ar-correos-02 | scam | yellow | green |
 | ar-correos-03 | scam | green | green |
-| ar-correos-04 | scam | yellow | red |
-| ar-dhl-01 | scam | yellow | red |
-| ar-mrw-01 | scam | yellow | red |
-| ar-seur-01 | scam | yellow | red |
+| ar-correos-04 | scam | green | red |
+| ar-dhl-01 | scam | green | red |
+| ar-mrw-01 | scam | green | red |
+| ar-seur-01 | scam | green | red |
 | ar-tgss-01 | scam | green | red |
 | ar-aeat-01 | scam | yellow | yellow |
-| ar-hijo-01 | scam | yellow | yellow |
+| ar-hijo-01 | scam | green | yellow |
 | ar-hijo-02 | scam | green | yellow |
 | ar-netflix-01 | scam | yellow | red |
 | ar-netflix-02 | scam | green | yellow |
 | ar-netflix-03 | scam | green | red |
 | ar-netflix-04 | scam | green | green |
 | ar-iberdrola-01 | scam | green | green |
-| ar-movistar-01 | scam | yellow | red |
-| ar-santander-01 | scam | red | red |
+| ar-movistar-01 | scam | green | red |
+| ar-santander-01 | scam | yellow | red |
 | ar-fedex-01 | scam | green | green |
 | ar-fedex-02 | scam | green | yellow |
 | ar-amazon-01 | scam | green | green |
 | ar-dgt-01 | scam | red | red |
 | ar-dgt-02 | scam | yellow | yellow |
 | ar-dgt-03 | scam | red | red |
-| inc-bank-01 | scam | red | red |
-| inc-bank-22 | scam | yellow | red |
+| inc-bank-01 | scam | yellow | red |
+| inc-bank-22 | scam | green | red |
 | inc-bank-33 | scam | red | red |
-| inc-bank-39 | scam | yellow | red |
+| inc-bank-39 | scam | green | red |
 | inc-bank-40 | scam | green | red |
 | inc-bank-42 | scam | yellow | red |
 | ar-uci-01 | legit | green | green |

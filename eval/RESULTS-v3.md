@@ -6,24 +6,27 @@ Set: `eval/cases-v3.jsonl` · 50 messages (25 scams, 25 legitimate) · date 2026
 
 | Arm | Scams caught (red) | Scams missed (green) | Legit cleared (green) | False alarms (legit red) | Errors |
 |---|---|---|---|---|---|
-| baseline (no Clef) | 18/25 (72%) | 0/25 (0%) | 25/25 (100%) | 0/25 (0%) | 0 |
+| baseline (no Clef) | 8/25 (32%) | 4/25 (16%) | 25/25 (100%) | 0/25 (0%) | 0 |
 | clef | 25/25 (100%) | 0/25 (0%) | 23/25 (92%) | 0/25 (0%) | 0 |
 
 
 `baseline` = same link check and same rules, but keyword guesses (`lib/mock.js`) instead of Clef. What `clef` gains over it is what the model adds.
 
-Median latency with Clef: 634 ms per message.
+Median latency with Clef: 664 ms per message.
 
 ## baseline
 
 | | Red | Yellow | Green | Error |
 |---|---|---|---|---|
-| **Scams** (25) | 18 | 7 | 0 | 0 |
+| **Scams** (25) | 8 | 13 | 4 | 0 |
 | **Legitimate** (25) | 0 | 0 | 25 | 0 |
 
 ### Where it fails
 
-No scam came out green and no legitimate message came out red.
+- `inc3-08` (scam) → green · clean
+- `inc3-15` (scam) → green · clean
+- `inc3-20` (scam) → green · clean
+- `inc3-22` (scam) → green · clean
 
 ## clef
 
@@ -41,28 +44,28 @@ No scam came out green and no legitimate message came out red.
 | id | label | baseline | clef |
 |---|---|---|---|
 | inc3-01 | scam | red | red |
-| inc3-02 | scam | red | red |
-| inc3-03 | scam | red | red |
+| inc3-02 | scam | yellow | red |
+| inc3-03 | scam | yellow | red |
 | inc3-04 | scam | yellow | red |
-| inc3-05 | scam | red | red |
+| inc3-05 | scam | yellow | red |
 | inc3-06 | scam | red | red |
-| inc3-07 | scam | red | red |
-| inc3-08 | scam | yellow | red |
-| inc3-09 | scam | red | red |
-| inc3-10 | scam | red | red |
+| inc3-07 | scam | yellow | red |
+| inc3-08 | scam | green | red |
+| inc3-09 | scam | yellow | red |
+| inc3-10 | scam | yellow | red |
 | inc3-11 | scam | red | red |
 | inc3-12 | scam | red | red |
-| inc3-13 | scam | red | red |
-| inc3-14 | scam | red | red |
-| inc3-15 | scam | yellow | red |
+| inc3-13 | scam | yellow | red |
+| inc3-14 | scam | yellow | red |
+| inc3-15 | scam | green | red |
 | inc3-16 | scam | red | red |
 | inc3-17 | scam | red | red |
-| inc3-18 | scam | red | red |
+| inc3-18 | scam | yellow | red |
 | inc3-19 | scam | red | red |
-| inc3-20 | scam | yellow | red |
+| inc3-20 | scam | green | red |
 | inc3-21 | scam | red | red |
-| inc3-22 | scam | yellow | red |
-| inc3-23 | scam | red | red |
+| inc3-22 | scam | green | red |
+| inc3-23 | scam | yellow | red |
 | inc3-24 | scam | yellow | red |
 | inc3-25 | scam | yellow | red |
 | uci3-01 | legit | green | green |

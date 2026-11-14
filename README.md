@@ -41,7 +41,7 @@ Resultado: [`eval/RESULTS-v3.md`](eval/RESULTS-v3.md). Conjunto: [`eval/cases-v3
 |---|---|---|---|---|---|
 | **Legit? con Clef (ahora)** | **25/25** | 0/25 | **0/25** | 23/25 | **0/25** |
 | Legit? con Clef (antes de los cambios) | 20/25 | 5/25 | 0/25 | 23/25 | 0/25 |
-| Sin Clef (palabras clave, reglas de ahora) | 18/25 | 7/25 | 0/25 | 25/25 | 0/25 |
+| Sin Clef (palabras clave) | 8/25 | 13/25 | 4/25 | 25/25 | 0/25 |
 
 Qué cambió (todo medido antes en desarrollo, ver abajo):
 
@@ -51,7 +51,8 @@ Qué cambió (todo medido antes en desarrollo, ver abajo):
 
 **Lee esto antes de citar la v3:**
 
-- Las 25 estafas son SMS de INCIBE con el enlace sustituido por «[URL fraudulenta]», y casi todas son bancarias. La regla nueva encaja muy bien con ellas, y por eso la versión sin Clef también sube (de 8 a 18 en rojo). En la vida real el enlace estaría y lo comprobaría el código.
+- Las 25 estafas son SMS de INCIBE con el enlace sustituido por «[URL fraudulenta]», y casi todas son bancarias: la regla nueva encaja muy bien con ellas. En la vida real el enlace estaría y lo comprobaría el código.
+- «Sin Clef» es la versión de palabras clave que definió el equipo al principio. Las preguntas añadidas después (te manda a un enlace, número nuevo, solo un código, apuestas) solo las responde Clef: sin Clef se quedan en «no». Si se les diera una versión por palabras clave (por ejemplo, buscar «[URL»), la versión sin Clef acertaría más en este conjunto, precisamente porque la fuente deja esa marca.
 - Los legítimos siguen siendo SMS informales en inglés. Los dos en amarillo («change the number», «get out here quick») ya salían así antes.
 - n = 50. Es una indicación, no una tasa de error.
 
