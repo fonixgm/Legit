@@ -172,7 +172,7 @@ const I18N = {
     speak: "🔊 Leérmelo en voz alta", stopSpeak: "⏹ Parar",
     checks: {
       asks: "¿Te pide datos, códigos o dinero?", claims: "¿Dice ser alguien?", link: "¿El enlace es de verdad suyo?",
-      yes: "Sí", no: "No", nobody: "No", noLink: "No hay enlace", unknownSender: "No lo reconozco",
+      yes: "Sí", no: "No", nobody: "No", relative: "Sí: un familiar", noLink: "No hay enlace", unknownSender: "No lo reconozco",
     },
     mock: "Modo de pruebas: estas respuestas son simuladas, no vienen de Clef.",
     privacy: "No guardamos tu mensaje. Se analiza y se olvida.",
@@ -245,7 +245,7 @@ const I18N = {
     speak: "🔊 Read it to me", stopSpeak: "⏹ Stop",
     checks: {
       asks: "Does it ask for data, codes or money?", claims: "Does it say it is someone?", link: "Is the link really theirs?",
-      yes: "Yes", no: "No", nobody: "No", noLink: "No link", unknownSender: "I don't recognise it",
+      yes: "Yes", no: "No", nobody: "No", relative: "Yes: a relative", noLink: "No link", unknownSender: "I don't recognise it",
     },
     mock: "Test mode: these answers are simulated, they do not come from Clef.",
     privacy: "We don't store your message. It is analysed and forgotten.",
@@ -367,7 +367,7 @@ function renderChecks(data) {
   const c = I18N[lang].checks;
   const asks = data.signals.asks >= 0.5;
   const rows = [[c.asks, asks ? c.yes : c.no, asks ? "bad" : "ok"]];
-  rows.push([c.claims, data.brand ? `${c.yes}: ${data.brand}` : c.nobody, ""]);
+  rows.push([c.claims, data.brand ? `${c.yes}: ${data.brand}` : data.type === "family" ? c.relative : c.nobody, ""]);
   if (!data.links.length) rows.push([c.link, c.noLink, ""]);
   else if (!data.brand) rows.push([c.link, c.unknownSender, ""]);
   else {
