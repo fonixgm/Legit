@@ -193,6 +193,7 @@ const I18N = {
     errors: {
       empty: "Pega primero el mensaje.", too_long: "El mensaje es demasiado largo. Pega solo la parte importante.",
       busy: "Hay mucha gente a la vez. Espera unos segundos y vuelve a intentarlo.",
+      slow_down: "Has comprobado muchos mensajes seguidos. Espera un minuto y vuelve a intentarlo.",
       unavailable: "Ahora mismo no puedo comprobarlo. Si dudas, no pulses ningún enlace.",
       clipboard: "No puedo leer el portapapeles. Mantén pulsado el cuadro y elige «Pegar».",
     },
@@ -273,6 +274,7 @@ const I18N = {
     errors: {
       empty: "Paste the message first.", too_long: "The message is too long. Paste only the important part.",
       busy: "Too many people at once. Wait a few seconds and try again.",
+      slow_down: "You have checked many messages in a row. Wait a minute and try again.",
       unavailable: "I can't check it right now. When in doubt, don't tap any link.",
       clipboard: "I can't read the clipboard. Press and hold the box and choose “Paste”.",
     },
@@ -491,16 +493,24 @@ function render(data) {
   $("mock").hidden = !data.mock;
 }
 
-async function check() {
+async function check({ source } = {}) {
   const text = $("text").value.trim();
   if (!text) return showError("empty");
   const go = $("go");
   go.disabled = true; go.textContent = I18N[lang].checking;
   try {
-    const res = await fetch("/api/check", {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }),
-    });
-    const data = await res.json().catch(() => ({}));
+    // When everyone checks at once the server says "busy": wait in line and try again
+    // instead of showing an error. Only give up after a few tries.
+    let res, data;
+    for (let attempt = 0; ; attempt++) {
+      res = await fetch("/api/check", {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, source }),
+      });
+      data = await res.json().catch(() => ({}));
+      if (res.status !== 503 || data.error !== "busy" || attempt >= 4) break;
+      go.textContent = I18N[lang].queued;
+      await new Promise((r) => setTimeout(r, 1500 + attempt * 1000 + Math.random() * 1000));
+    }
     if (!res.ok) { showError(data.error ?? "unavailable"); if (data.detail) console.warn("Legit?", data.detail, data.message ?? ""); } else render({ ...data, text });
   } catch {
     showError("unavailable");
@@ -549,11 +559,13 @@ async function getOcr() {
 async function prepareImage(blob) {
   const bmp = await createImageBitmap(blob);
   const scale = bmp.width > 1600 ? 1600 / bmp.width : bmp.width < 700 ? 2 : 1;
-  if (scale === 1) return blob;
+  const width = Math.round(bmp.width * scale), height = Math.round(bmp.height * scale);
+  if (scale === 1) return { image: blob, width, height };
   const canvas = document.createElement("canvas");
-  canvas.width = Math.round(bmp.width * scale); canvas.height = Math.round(bmp.height * scale);
-  canvas.getContext("2d").drawImage(bmp, 0, 0, canvas.width, canvas.height);
-  return new Promise((resolve) => canvas.toBlob((b) => resolve(b ?? blob), "image/png"));
+  canvas.width = width; canvas.height = height;
+  canvas.getContext("2d").drawImage(bmp, 0, 0, width, height);
+  const image = await new Promise((resolve) => canvas.toBlob((b) => resolve(b ?? blob), "image/png"));
+  return { image, width, height };
 }
 let reading = false;
 async function readShot(blob) {
@@ -565,14 +577,20 @@ async function readShot(blob) {
   note.hidden = false; note.textContent = t().shotLoading;
   ocrProgress = (m) => { if (m.status === "recognizing text") note.textContent = fill(t().shotReading, { pct: Math.round((m.progress || 0) * 100) }); };
   try {
-    const [worker, image, tidy] = await Promise.all([getOcr(), prepareImage(blob).catch(() => blob), import("/ocr-text.js")]);
-    const { data } = await worker.recognize(image);
-    const text = tidy.cleanOcrText(data.text || "");
+    const [worker, prepared, tidy] = await Promise.all([getOcr(), prepareImage(blob).catch(() => ({ image: blob })), import("/ocr-text.js")]);
+    const { data } = await worker.recognize(prepared.image, {}, { text: true, blocks: true });
+    // Keep the message, drop the phone's interface (clock, sender, dates, spam warnings).
+    const lines = [];
+    for (const block of data.blocks ?? []) for (const para of block.paragraphs ?? []) for (const line of para.lines ?? []) {
+      lines.push({ text: line.text, confidence: line.confidence, y0: line.bbox.y0, y1: line.bbox.y1 });
+    }
+    const picked = lines.length ? tidy.pickMessage(lines, prepared) : "";
+    const text = tidy.cleanOcrText(picked || data.text || "");
     if (text.replace(/\s/g, "").length < 8) { note.textContent = t().shotEmpty; return; }
     $("text").value = text;
     note.textContent = t().shotDone;
     shot.disabled = false; go.disabled = false;
-    await check();
+    await check({ source: "screenshot" });
   } catch {
     note.textContent = t().shotFail;
   } finally {

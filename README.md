@@ -111,7 +111,7 @@ Cómo se recogen los casos: [`eval/README.md`](eval/README.md). `eval/tuning.jso
 - No sustituye a tu banco.
 - No comprueba números de teléfono ni abre los enlaces.
 - No guarda los mensajes: se analizan en el servidor y no se escriben en disco ni en los logs. El veredicto se recuerda unos minutos en memoria, bajo un hash del texto, para no repetir la consulta si varias personas comprueban el mismo mensaje.
-- Las capturas se leen en el propio navegador (OCR con Tesseract.js) y la imagen no se envía a ningún sitio; lo que se comprueba es el texto leído, que queda a la vista para corregirlo. Un enlace mal leído puede dar un aviso equivocado. Clef no ve la imagen.
+- Las capturas se leen en el propio navegador (OCR con Tesseract.js) y la imagen no se envía a ningún sitio. De la pantalla se descarta la interfaz del móvil (hora, remitente, fechas, avisos de spam de la app) y se comprueba solo el mensaje, que queda a la vista para corregirlo. Un enlace mal leído puede dar un aviso equivocado. Clef no ve la imagen: recibe el texto y sabe que viene de una captura.
 
 ## Ejecutarlo
 
