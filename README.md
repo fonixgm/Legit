@@ -15,6 +15,7 @@ Pensado para una persona mayor: un color (rojo, amarillo o verde: el verde es «
    | Pregunta | Tipo | Respuestas |
    |---|---|---|
    | ¿Pide datos, códigos o dinero? | `noul` | probabilidad de «sí» |
+   | ¿Te manda llamar o escribir a un contacto que da? | `noul` | probabilidad de «sí» (estafas de «llama a este número», sin enlace) |
    | ¿De qué marca dice ser? | `choice` ×2 | 30 marcas globales, «otra» y «ninguna» (en dos preguntas: Clef admite 26 opciones por pregunta) |
    | ¿Qué patrón de estafa sigue? | `choice` | banco, paquete, cuenta, premio, familiar en apuros, soporte técnico, inversión, ninguno |
    | ¿Cuánta presión mete? | `score` | de «ninguna» a «extrema» |

@@ -1,0 +1,14 @@
+// TUNING SET: written by hand by Claude, NOT real messages. Use it to tune thresholds and wording.
+// Never publish a figure from it: the published one comes from eval/cases.jsonl (30 real + 30 real).
+{"id": "t01", "label": "scam", "text": "Hola mamá, se me ha roto el móvil, este es mi número nuevo. Necesito que me hagas un Bizum de 480 euros hoy, luego te explico.", "source": "synthetic-tuning: familia sin enlace"}
+{"id": "t02", "label": "scam", "text": "BBVA: cargo de 899 EUR en AMAZON. Si no lo reconoces llama ya al 912 345 678 para anularlo.", "source": "synthetic-tuning: llamada de vuelta"}
+{"id": "t03", "label": "scam", "text": "Enhorabuena, has ganado un iPhone 16. Reclámalo antes de 2 horas aquí: hxxps://premio-movil-gratis[.]top/ganador", "source": "synthetic-tuning: sin marca, premio"}
+{"id": "t04", "label": "scam", "text": "Hola, soy Laura de Inversiones Cripto. Mis clientes ganan 300% al mes. Te añado a un grupo VIP, solo necesito 250 euros para empezar.", "source": "synthetic-tuning: inversión por WhatsApp"}
+{"id": "t05", "label": "scam", "text": "Correos: su paquete está retenido por tasas de aduana de 2,45 EUR. Pague para recibirlo: hxxps://correos-aduana-pago[.]info/es", "source": "synthetic-tuning: correos, aduana"}
+{"id": "t06", "label": "scam", "text": "Microsoft: te han compartido un documento. Inicia sesión para verlo: hxxps://contoso-hr[.]sharepoint[.]com/doc", "source": "synthetic-tuning: sharepoint phishing"}
+{"id": "t07", "label": "legit", "text": "BBVA: compra de 23,90 EUR en MERCADONA con tu tarjeta *4821. Si no la reconoces, entra en https://www.bbva.es/ o llama al número de tu tarjeta.", "source": "synthetic-tuning: banco real con enlace"}
+{"id": "t08", "label": "legit", "text": "Tu código de verificación de Google es 482913. No lo compartas con nadie.", "source": "synthetic-tuning: código de verificación"}
+{"id": "t09", "label": "legit", "text": "Correos: tu envío PQ1234 está en reparto hoy. Seguimiento: https://www.correos.es/seguimiento", "source": "synthetic-tuning: seguimiento Correos"}
+{"id": "t10", "label": "legit", "text": "Mamá, voy tarde, cenad sin mí. Te llamo luego.", "source": "synthetic-tuning: familia normal"}
+{"id": "t11", "label": "legit", "text": "Recordatorio: tienes cita el martes a las 10:30 en el centro de salud. Si no puedes asistir, llama al 900 123 456.", "source": "synthetic-tuning: cita médica"}
+{"id": "t12", "label": "legit", "text": "Oye, ¿me haces un bizum de 12 euros de la cena de ayer? Gracias!!", "source": "synthetic-tuning: amiga pide bizum"}

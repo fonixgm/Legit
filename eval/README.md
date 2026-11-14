@@ -21,6 +21,16 @@ One JSON object per line:
 - **Anonymise**: remove names, phone numbers, card digits, IBANs and e-mails. Neutralise scam links: `hxxps://evil[.]com/x` (the runner undoes it before parsing).
 - **Do not tune on the test set.** Tune thresholds on a small separate set, then run the 60 once and publish what comes out, failures included.
 
+## Tuning set
+
+`eval/tuning.jsonl` has 12 messages written by hand (not real). Use them to try wording and thresholds:
+
+```bash
+NAN_KEY=... npm run eval -- eval/tuning.jsonl
+```
+
+They are for tuning only. Never publish a figure from them, and never tune on `cases.jsonl`.
+
 ## Run
 
 ```bash
