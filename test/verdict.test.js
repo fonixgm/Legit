@@ -97,3 +97,15 @@ test("a missing or malformed Clef answer is an error, never a green verdict", ()
   }
   assert.doesNotThrow(() => readAnswers({ answers: ok }));
 });
+
+test("pages anyone can publish on a brand's domain never clear a message", () => {
+  // Calm, no pressure, asks for a login: with a truly official link this would be green.
+  const calm = clef({ asks: 0.9, brand: { id: "microsoft", p: 0.95 }, pressure: 0.2 });
+  assert.equal(run(calm, "https://www.microsoft.com/account").verdict, "green");
+  for (const url of ["https://contoso-hr.sharepoint.com/doc", "https://sites.google.com/view/verifica", "https://t.me/soporte_bot"]) {
+    const r = run({ ...calm, brand: { id: url.includes("google") ? "google" : url.includes("t.me") ? "telegram" : "microsoft", p: 0.95 } }, url);
+    assert.notEqual(r.verdict, "green", url);
+    assert.ok(r.reasons.some((x) => x.code === "user_content_link"), url);
+    assert.equal(r.own, false, url);
+  }
+});
