@@ -40,7 +40,6 @@ Resultado: [`eval/RESULTS-v3.md`](eval/RESULTS-v3.md). Conjunto: [`eval/cases-v3
 | | **Estafas que pasan como seguras** (verde) ↓ | **Estafas avisadas como estafa** (rojo) ↑ | Legítimos acusados de estafa (rojo) ↓ | Legítimos con aviso de «compruébalo» (amarillo) ↓ |
 |---|---|---|---|---|
 | **Legit? con Clef (ahora)** | **0/25** | **25/25** | **0/25** | 2/25 |
-| Legit? con Clef (antes de los cambios) | 0/25 | 20/25 | 0/25 | 2/25 |
 | Sin Clef (palabras clave) | 4/25 | 8/25 | 0/25 | 0/25 |
 
 Cómo leerla: la primera columna es el error caro (alguien se fía de una estafa); la última es el precio de avisar. Sin Clef no avisa a ningún legítimo porque casi no avisa de nada: deja 17 de 25 estafas sin marcar en rojo, 4 de ellas como seguras.
