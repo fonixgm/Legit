@@ -37,11 +37,13 @@ Sin Clef no hay veredicto: es quien dice qué marca se está suplantando, y sin 
 
 Resultado: [`eval/RESULTS-v3.md`](eval/RESULTS-v3.md). Conjunto: [`eval/cases-v3.jsonl`](eval/cases-v3.jsonl): las 25 estafas de INCIBE que no estaban en ninguna medición anterior y 25 SMS legítimos nuevos de la misma colección. Se subió a git (commit `4cae085`) **antes** de cambiar ninguna regla, y las reglas se ajustaron mirando solo la v1, la v2 y el conjunto de ajuste. Se midió una sola vez con el código de antes y otra con el de después.
 
-| | Estafas en rojo | Estafas en amarillo | **Estafas en verde** | Legítimos en verde | **Legítimos en rojo** |
-|---|---|---|---|---|---|
-| **Legit? con Clef (ahora)** | **25/25** | 0/25 | **0/25** | 23/25 | **0/25** |
-| Legit? con Clef (antes de los cambios) | 20/25 | 5/25 | 0/25 | 23/25 | 0/25 |
-| Sin Clef (palabras clave) | 8/25 | 13/25 | 4/25 | 25/25 | 0/25 |
+| | **Estafas que pasan como seguras** (verde) ↓ | **Estafas avisadas como estafa** (rojo) ↑ | Legítimos acusados de estafa (rojo) ↓ | Legítimos con aviso de «compruébalo» (amarillo) ↓ |
+|---|---|---|---|---|
+| **Legit? con Clef (ahora)** | **0/25** | **25/25** | **0/25** | 2/25 |
+| Legit? con Clef (antes de los cambios) | 0/25 | 20/25 | 0/25 | 2/25 |
+| Sin Clef (palabras clave) | 4/25 | 8/25 | 0/25 | 0/25 |
+
+Cómo leerla: la primera columna es el error caro (alguien se fía de una estafa); la última es el precio de avisar. Sin Clef no avisa a ningún legítimo porque casi no avisa de nada: deja 17 de 25 estafas sin marcar en rojo, 4 de ellas como seguras.
 
 Qué cambió (todo medido antes en desarrollo, ver abajo):
 
