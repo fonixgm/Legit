@@ -6,7 +6,7 @@ Pegas el mensaje que te ha llegado (SMS, WhatsApp o correo) y en un segundo te d
 
 > «Parece Amazon, pero el enlace no es de Amazon. No pulses.»
 
-Pensado para una persona mayor: un color (rojo, amarillo o verde), tres preguntas con respuesta sí/no (¿te pide datos?, ¿dice ser alguien?, ¿el enlace es de verdad suyo?), una instrucción y un botón para que se lo lea en voz alta. Si duda, otro para enviárselo a un familiar.
+Pensado para una persona mayor: un color (rojo, amarillo o verde: el verde es «no veo señales», no una garantía), tres preguntas con respuesta sí/no (¿te pide datos?, ¿dice ser alguien?, ¿el enlace es de verdad suyo?), una instrucción y un botón para que se lo lea en voz alta. Si duda, otro para enviárselo a un familiar.
 
 ## Cómo decide
 
