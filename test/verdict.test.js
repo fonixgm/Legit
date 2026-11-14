@@ -147,3 +147,13 @@ test("every brand group fits in one Clef choice question", () => {
   for (const k of BRAND_QUESTIONS) assert.ok(Object.keys(q[k].criteria).length <= 26, k);
   assert.ok(BRAND_QUESTIONS.length >= 4);
 });
+
+test("'hi mum, new number, write to me' (no money asked yet) warns instead of clearing", () => {
+  const r = run(clef({ asks: 0.17, calls: 0.95, type: { id: "family", p: 0.95 }, pressure: 0.3 }), "Hola Mama, mi telefono se ha roto, este es mi nuevo número, enviame un mensaje por WhatsApp.");
+  assert.equal(r.verdict, "yellow");
+  assert.equal(r.headline.code, "family_new_contact");
+  // once it asks for money it is red
+  assert.equal(run(clef({ asks: 0.9, calls: 0.9, type: { id: "family", p: 0.95 }, pressure: 1.5 })).verdict, "red");
+  // an ordinary family message stays green
+  assert.equal(run(clef({ calls: 0.3, pressure: 0.1 }), "Mamá, voy tarde, cenad sin mí.").verdict, "green");
+});
